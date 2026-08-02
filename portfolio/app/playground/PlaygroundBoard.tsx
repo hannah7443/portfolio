@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 type Corner = "tl" | "tr" | "bl" | "br";
 
@@ -110,7 +111,7 @@ const ARTWORKS: Artwork[] = [
   },
 ];
 
-const TEXT_BOX = { left: 510, top: 352, width: 260, height: 170 };
+const TEXT_BOX = { left: 470, top: 287, width: 340, height: 220 };
 const TEXT_CENTER = {
   x: TEXT_BOX.left + TEXT_BOX.width / 2,
   y: TEXT_BOX.top + TEXT_BOX.height / 2,
@@ -142,6 +143,49 @@ function boxEdgePoint(dx: number, dy: number) {
   const y = TEXT_CENTER.y + Math.sign(dy) * halfH;
   const x = clamp(TEXT_CENTER.x + dx * (halfH / Math.abs(dy)), TEXT_CENTER.x - halfW, TEXT_CENTER.x + halfW);
   return { x, y };
+}
+
+const CLEARANCE = 6;
+
+type Center = { cx: number; cy: number; width: number; height: number };
+
+const TEXT_OBSTACLE: Center = {
+  cx: TEXT_CENTER.x,
+  cy: TEXT_CENTER.y,
+  width: BLACK_BOX.width,
+  height: BLACK_BOX.height,
+};
+
+// Pushes `box` fully away from the fixed text obstacle along whichever axis
+// needs the smaller shove, so it never overlaps the text.
+function pushOutOfText(box: Center) {
+  const overlapX = (box.width + TEXT_OBSTACLE.width) / 2 + CLEARANCE - Math.abs(box.cx - TEXT_OBSTACLE.cx);
+  const overlapY = (box.height + TEXT_OBSTACLE.height) / 2 + CLEARANCE - Math.abs(box.cy - TEXT_OBSTACLE.cy);
+  if (overlapX <= 0 || overlapY <= 0) return;
+
+  if (overlapX < overlapY) {
+    box.cx += overlapX * (box.cx >= TEXT_OBSTACLE.cx ? 1 : -1);
+  } else {
+    box.cy += overlapY * (box.cy >= TEXT_OBSTACLE.cy ? 1 : -1);
+  }
+}
+
+// Separates two overlapping artwork boxes by nudging each away (half each)
+// along whichever axis needs the smaller shove.
+function separate(a: Center, b: Center) {
+  const overlapX = (a.width + b.width) / 2 + CLEARANCE - Math.abs(a.cx - b.cx);
+  const overlapY = (a.height + b.height) / 2 + CLEARANCE - Math.abs(a.cy - b.cy);
+  if (overlapX <= 0 || overlapY <= 0) return;
+
+  if (overlapX < overlapY) {
+    const push = (overlapX / 2) * (a.cx <= b.cx ? -1 : 1);
+    a.cx += push;
+    b.cx -= push;
+  } else {
+    const push = (overlapY / 2) * (a.cy <= b.cy ? -1 : 1);
+    a.cy += push;
+    b.cy -= push;
+  }
 }
 
 const ORBITS = ARTWORKS.map((artwork) => {
@@ -186,15 +230,35 @@ export default function PlaygroundBoard() {
 
       const hubs: Record<string, { x: number; y: number }> = {};
 
+      const centers: Record<string, Center> = {};
       ARTWORKS.forEach((artwork, i) => {
-        const box = boxRefs.current[artwork.id];
-        if (!box) return;
         const { radius, angle0 } = ORBITS[i];
         const angle =
           angle0 +
           artwork.orbitDirection * (elapsedSeconds / artwork.orbitDuration) * 2 * Math.PI;
-        const cx = TEXT_CENTER.x + radius * Math.cos(angle);
-        const cy = TEXT_CENTER.y + radius * Math.sin(angle);
+        centers[artwork.id] = {
+          cx: TEXT_CENTER.x + radius * Math.cos(angle),
+          cy: TEXT_CENTER.y + radius * Math.sin(angle),
+          width: artwork.width,
+          height: artwork.height,
+        };
+      });
+
+      for (let pass = 0; pass < 4; pass++) {
+        for (const artwork of ARTWORKS) {
+          pushOutOfText(centers[artwork.id]);
+        }
+        for (let i = 0; i < ARTWORKS.length; i++) {
+          for (let j = i + 1; j < ARTWORKS.length; j++) {
+            separate(centers[ARTWORKS[i].id], centers[ARTWORKS[j].id]);
+          }
+        }
+      }
+
+      ARTWORKS.forEach((artwork) => {
+        const box = boxRefs.current[artwork.id];
+        if (!box) return;
+        const { cx, cy } = centers[artwork.id];
         box.style.left = pct(cx - artwork.width / 2, CANVAS_W);
         box.style.top = pct(cy - artwork.height / 2, CANVAS_H);
         hubs[artwork.id] = boxEdgePoint(cx - TEXT_CENTER.x, cy - TEXT_CENTER.y);
@@ -236,7 +300,7 @@ export default function PlaygroundBoard() {
         style={{ aspectRatio: `${CANVAS_W} / ${CANVAS_H}` }}
       >
         <div
-          className="absolute bg-blue-500"
+          className="absolute bg-black"
           style={{
             left: pct(BLACK_BOX.left, CANVAS_W),
             top: pct(BLACK_BOX.top, CANVAS_H),
@@ -310,10 +374,38 @@ export default function PlaygroundBoard() {
             width: pct(TEXT_BOX.width, CANVAS_W),
           }}
         >
-          <p className="redaction-50 text-[clamp(1.25rem,3vw,2.25rem)] not-italic">hannah&rsquo;s mosaic</p>
-          <p className="mt-2 text-[clamp(0.7rem,1.2vw,1.1rem)]">X | Instagram | TikTok</p>
-          <p className="text-[clamp(0.7rem,1.2vw,1.1rem)]">generative art &amp; mixed media</p>
-          <p className="text-[clamp(0.7rem,1.2vw,1.1rem)]">600,000+</p>
+          <p className="redaction-50 text-[clamp(1.6rem,3.8vw,3rem)] not-italic">hannah&rsquo;s mosaic</p>
+          <div className="mt-2 flex items-center justify-center gap-3">
+            <a href="https://x.com/hannahsmosaic" target="_blank" rel="noopener noreferrer">
+              <Image
+                src="/images/icons8-x-logo-30.png"
+                alt="X"
+                width={20}
+                height={20}
+                className="h-[clamp(1.4rem,2.6vw,2.2rem)] w-[clamp(1.4rem,2.6vw,2.2rem)] invert"
+              />
+            </a>
+            <a href="https://www.instagram.com/hannahs.mosaic/" target="_blank" rel="noopener noreferrer">
+              <Image
+                src="/images/icons8-instagram-logo-30.png"
+                alt="Instagram"
+                width={20}
+                height={20}
+                className="h-[clamp(1.4rem,2.6vw,2.2rem)] w-[clamp(1.4rem,2.6vw,2.2rem)] invert"
+              />
+            </a>
+            <a href="https://www.tiktok.com/@hannahs.mosaic" target="_blank" rel="noopener noreferrer">
+              <Image
+                src="/images/icons8-tiktok-logo-30.png"
+                alt="TikTok"
+                width={20}
+                height={20}
+                className="h-[clamp(1.4rem,2.6vw,2.2rem)] w-[clamp(1.4rem,2.6vw,2.2rem)] invert"
+              />
+            </a>
+          </div>
+          <p className="font-red-hat-mono text-[clamp(0.75rem,1.2vw,1.15rem)]">generative art &amp; mixed media</p>
+          <p className="font-red-hat-mono text-[clamp(0.75rem,1.2vw,1.15rem)]">600,000+ viewers</p>
         </div>
       </div>
     </div>
