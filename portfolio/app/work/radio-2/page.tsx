@@ -1,6 +1,7 @@
 import { BackToProjects, Sidebar, Section, type NavItem } from "../../components/ArchiveColumn";
 
 const NAV_ITEMS: NavItem[] = [
+  { label: "Building Radio's Future", id: "building-radios-future" },
   { label: "Live Website", id: "live-website" },
   { label: "Final Presentation", id: "final-presentation" },
 ];
@@ -11,6 +12,12 @@ export default function Radio2Page() {
       <BackToProjects />
       <Sidebar items={NAV_ITEMS} />
       <main className="ml-56 flex-1 px-12 pt-24">
+        <Section
+          id="building-radios-future"
+          title="Building Radio's Future"
+          titleClassName="text-5xl"
+          className="pt-6 pb-0"
+        />
         <Section id="live-website" title="Live Website">
           <p className="font-red-hat-mono text-black">
             View the live website here:{" "}

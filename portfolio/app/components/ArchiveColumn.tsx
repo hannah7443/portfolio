@@ -45,17 +45,19 @@ export function Section({
   id,
   title,
   titleClassName,
+  className,
   children,
 }: {
   id: string;
   title: string;
   titleClassName?: string;
+  className?: string;
   children?: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 py-6">
+    <section id={id} className={`scroll-mt-24 ${className ?? "py-6"}`}>
       <h2 className={`redaction-50 ${titleClassName ?? "text-3xl"}`}>{title}</h2>
-      <div className="mt-4 text-sm text-black/70">{children}</div>
+      {children && <div className="mt-4 text-sm text-black/70">{children}</div>}
     </section>
   );
 }
