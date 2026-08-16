@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ArchiveLinkButton from "../components/ArchiveLinkButton";
+import VinylPlayer from "../components/VinylPlayer";
 
 const figTreeImage = "/images/work-buttons/fig-tree.png";
 const radio2Image = "/images/work-buttons/radio-2-cover.jpg";
@@ -9,19 +10,38 @@ const grassTexture = "/images/work-banner/grass.png";
 const fabricTexture = "/images/work-banner/fabric.png";
 const woodTexture = "/images/work-banner/wood.jpg";
 const maskShape = "/images/work-banner/mask.svg";
+const backgroundVideo = "/homepage-gifs/left-shift-background-animation.mp4";
+const pageBackground = "#DAC399";
 
 export default function WorkPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center pt-24">
-      <div className="flex w-full justify-center overflow-x-hidden px-4">
-        <div className="relative aspect-[1150/360] w-full max-w-[1150px]">
+    <div className="flex min-h-screen flex-col items-center" style={{ backgroundColor: pageBackground }}>
+      <div
+        className="relative mb-[5vh] flex h-[85vh] min-h-[550px] w-full justify-center"
+        style={{ backgroundColor: pageBackground }}
+      >
+        <video
+          className="absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2"
+          src={backgroundVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        <div className="absolute bottom-6 right-6 z-20 translate-x-[-100px] translate-y-[360px]">
+          <VinylPlayer />
+        </div>
+        <div className="relative flex w-full justify-center px-4 pb-8 pt-32">
+          <div className="relative aspect-[1150/360] w-full max-w-[1150px] translate-x-[18%] translate-y-[-4%] scale-95">
           {/* green rectangle cluster */}
-          <div className="absolute bg-[#5c7e4f] opacity-70" style={{ left: "48.38%", top: "55.28%", width: "15.13%", height: "23.61%" }} />
-          <div className="absolute bg-[#8e9519] opacity-70" style={{ left: "60.73%", top: "53.61%", width: "15.13%", height: "23.61%" }} />
-          <div className="absolute bg-[#cee6a7] opacity-70" style={{ left: "62.64%", top: "43.61%", width: "11.13%", height: "23.61%" }} />
-          <div className="absolute bg-[#c3d254] opacity-70" style={{ left: "66.64%", top: "44.44%", width: "11.22%", height: "19.72%" }} />
-          <div className="absolute bg-[#2b400a] opacity-70" style={{ left: "50.56%", top: "46.67%", width: "15.13%", height: "23.61%" }} />
-          <div className="absolute bg-[#355631] opacity-70" style={{ left: "54.03%", top: "62.78%", width: "16.43%", height: "18.89%" }} />
+          <div className="absolute inset-0" style={{ transform: "translateY(-4%)" }}>
+            <div className="absolute bg-[#5c7e4f] opacity-70" style={{ left: "48.38%", top: "55.28%", width: "15.13%", height: "23.61%" }} />
+            <div className="absolute bg-[#8e9519] opacity-70" style={{ left: "60.73%", top: "53.61%", width: "15.13%", height: "23.61%" }} />
+            <div className="absolute bg-[#cee6a7] opacity-70" style={{ left: "62.64%", top: "43.61%", width: "11.13%", height: "23.61%" }} />
+            <div className="absolute bg-[#c3d254] opacity-70" style={{ left: "66.64%", top: "44.44%", width: "11.22%", height: "19.72%" }} />
+            <div className="absolute bg-[#2b400a] opacity-70" style={{ left: "50.56%", top: "46.67%", width: "15.13%", height: "23.61%" }} />
+            <div className="absolute bg-[#355631] opacity-70" style={{ left: "54.03%", top: "62.78%", width: "16.43%", height: "18.89%" }} />
+          </div>
 
           {/* mosaic color blocks */}
           <div className="absolute bg-[#201858]" style={{ left: "22.9%", top: "43.9%", width: "6%", height: "11.9%" }} />
@@ -43,7 +63,7 @@ export default function WorkPage() {
           <div className="absolute bg-[#220cc3]" style={{ left: "36%", top: "67.5%", width: "7.2%", height: "4.4%" }} />
 
           {/* masked texture overlay, sitting on top of the green rectangles */}
-          <div className="absolute inset-0" style={{ transform: "scale(0.85)", transformOrigin: "62.1% 59%" }}>
+          <div className="absolute inset-0 z-10" style={{ transform: "scale(0.85) translateY(15%)", transformOrigin: "62.1% 59%" }}>
             <div
               className="absolute opacity-80"
               style={{
@@ -104,10 +124,10 @@ export default function WorkPage() {
 
           {/* title */}
           <p
-            className="-translate-x-1/2 redaction-50 absolute w-[76%] text-center leading-none text-white"
+            className="-translate-x-1/2 redaction-50 absolute z-20 w-[76%] text-center leading-none text-white"
             style={{
               left: "50%",
-              top: "44.7%",
+              top: "47%",
               fontSize: "clamp(1.75rem, 8vw, 6rem)",
               fontStyle: "normal",
             }}
@@ -115,9 +135,18 @@ export default function WorkPage() {
             hannah shin
           </p>
         </div>
+        </div>
       </div>
 
-      <div className="mt-16 flex w-full max-w-[1150px] flex-col gap-8 px-4 sm:flex-row">
+      <div
+        className="relative z-20 -mt-45 w-full max-w-[1150px] translate-x-[-5%] px-4 text-right font-red-hat-mono"
+        style={{ color: "#1a2340" }}
+      >
+        <p className="text-sm sm:text-base">cs + visual media + music @ duke</p>
+        <p className="text-sm sm:text-base">designer, musician, thinker, dreamer</p>
+      </div>
+
+      <div className="mt-56 flex w-full max-w-[1150px] flex-col gap-8 px-4 sm:flex-row">
         {/* radio button hidden for now
         <ArchiveLinkButton
           href="/work/radio"
