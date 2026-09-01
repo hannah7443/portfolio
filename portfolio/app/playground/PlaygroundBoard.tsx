@@ -111,7 +111,7 @@ const ARTWORKS: Artwork[] = [
   },
 ];
 
-const TEXT_BOX = { left: 470, top: 287, width: 340, height: 220 };
+const TEXT_BOX = { left: 510, top: 312, width: 260, height: 170 };
 const TEXT_CENTER = {
   x: TEXT_BOX.left + TEXT_BOX.width / 2,
   y: TEXT_BOX.top + TEXT_BOX.height / 2,
@@ -374,7 +374,7 @@ export default function PlaygroundBoard() {
             width: pct(TEXT_BOX.width, CANVAS_W),
           }}
         >
-          <p className="redaction-50 text-[clamp(1.6rem,3.8vw,3rem)] not-italic">hannah&rsquo;s mosaic</p>
+          <p className="redaction-50 text-[clamp(1.25rem,3vw,2.25rem)] not-italic">hannah&rsquo;s mosaic</p>
           <div className="mt-2 flex items-center justify-center gap-3">
             <a href="https://x.com/hannahsmosaic" target="_blank" rel="noopener noreferrer">
               <Image
@@ -382,7 +382,7 @@ export default function PlaygroundBoard() {
                 alt="X"
                 width={20}
                 height={20}
-                className="h-[clamp(1.4rem,2.6vw,2.2rem)] w-[clamp(1.4rem,2.6vw,2.2rem)] invert"
+                className="h-[clamp(0.9rem,1.6vw,1.3rem)] w-[clamp(0.9rem,1.6vw,1.3rem)] invert"
               />
             </a>
             <a href="https://www.instagram.com/hannahs.mosaic/" target="_blank" rel="noopener noreferrer">
@@ -391,7 +391,7 @@ export default function PlaygroundBoard() {
                 alt="Instagram"
                 width={20}
                 height={20}
-                className="h-[clamp(1.4rem,2.6vw,2.2rem)] w-[clamp(1.4rem,2.6vw,2.2rem)] invert"
+                className="h-[clamp(0.9rem,1.6vw,1.3rem)] w-[clamp(0.9rem,1.6vw,1.3rem)] invert"
               />
             </a>
             <a href="https://www.tiktok.com/@hannahs.mosaic" target="_blank" rel="noopener noreferrer">
@@ -400,12 +400,12 @@ export default function PlaygroundBoard() {
                 alt="TikTok"
                 width={20}
                 height={20}
-                className="h-[clamp(1.4rem,2.6vw,2.2rem)] w-[clamp(1.4rem,2.6vw,2.2rem)] invert"
+                className="h-[clamp(0.9rem,1.6vw,1.3rem)] w-[clamp(0.9rem,1.6vw,1.3rem)] invert"
               />
             </a>
           </div>
-          <p className="font-red-hat-mono text-[clamp(0.75rem,1.2vw,1.15rem)]">generative art &amp; mixed media</p>
-          <p className="font-red-hat-mono text-[clamp(0.75rem,1.2vw,1.15rem)]">600,000+ viewers</p>
+          <p className="font-red-hat-mono text-[clamp(0.7rem,1.2vw,1.1rem)]">generative art &amp; mixed media</p>
+          <p className="font-red-hat-mono text-[clamp(0.7rem,1.2vw,1.1rem)]">600,000+ viewers</p>
         </div>
       </div>
     </div>

@@ -47,13 +47,13 @@ export default function FigTreePage() {
               <span className="font-semibold">Ripe</span> &mdash; ready for action
             </li>
           </ul>
-          <p className="font-red-hat-mono mt-4 text-black">
+          <p className="font-red-hat-mono mt-4 text-white">
             Users can also build a sub-branch off of any fig tree to further grow their ideas.
           </p>
         </Section>
 
         <Section id="built-with" title="Built With">
-          <ul className="font-red-hat-mono list-disc space-y-2 pl-6 text-black">
+          <ul className="font-red-hat-mono list-disc space-y-2 pl-6 text-white">
             <li>
               <span className="font-semibold">Figma Design</span> &mdash; complete design system including
               components, color tokens, and typography
@@ -95,9 +95,9 @@ export default function FigTreePage() {
             >
               {"https://www.figma.com/make/Xg0OAxlVjMspf0wtB64ap1/Fig-Tree?code-node-id=0-9&p=f&t=MwXrjMQSv6nKpfFQ-0&fullscreen=1"}
             </a>
-          </p>
-        </Section>
+        </p>
       </main>
     </div>
+  
   );
 }

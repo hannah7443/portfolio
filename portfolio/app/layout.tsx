@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Red_Hat_Mono } from "next/font/google";
 import Nav from "./components/Nav";
 import "./globals.css";
 
@@ -10,6 +10,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const redHatMono = Red_Hat_Mono({
+  variable: "--font-red-hat-mono",
   subsets: ["latin"],
 });
 
@@ -26,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${redHatMono.variable} h-full antialiased`}
     >
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/hdq7wey.css" />
