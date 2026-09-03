@@ -1,0 +1,53 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import type { NavMarker } from "./markers";
+import { LABEL_FONT_SIZE_PX } from "./labelFont";
+
+const VIDEO_EXTENSIONS = [".mp4", ".mov", ".webm"];
+const isVideo = (src: string) => VIDEO_EXTENSIONS.some((ext) => src.toLowerCase().endsWith(ext));
+
+export default function NavPreviewBox({ marker, size }: { marker: NavMarker; size: number }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      href={marker.href}
+      className="pointer-events-auto relative block h-full w-full"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+    >
+      <span
+        className="font-red-hat-mono pointer-events-none absolute left-0 top-0 whitespace-nowrap px-2 py-1 text-left font-bold uppercase leading-none text-white"
+        style={{ fontSize: LABEL_FONT_SIZE_PX }}
+      >
+        {marker.label}
+      </span>
+
+      {hovered && (
+        <div
+          className="font-red-hat-mono pointer-events-none absolute z-10 flex flex-col gap-2 border border-black/40 bg-[var(--background)] p-2 shadow-lg"
+          style={{
+            left: "100%",
+            top: 0,
+            width: Math.max(180, size * 1.6),
+            marginLeft: 8,
+          }}
+        >
+          <div className="relative aspect-video w-full overflow-hidden bg-black/5">
+            {isVideo(marker.thumbnail) ? (
+              <video src={marker.thumbnail} className="h-full w-full object-cover" autoPlay muted loop playsInline />
+            ) : (
+              <Image src={marker.thumbnail} alt={marker.label} fill className="object-cover" />
+            )}
+          </div>
+          <span className="text-sm">{marker.label}</span>
+        </div>
+      )}
+    </Link>
+  );
+}
