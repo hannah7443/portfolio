@@ -4,6 +4,9 @@
 export const LABEL_FONT_SIZE_PX = 11;
 export const LABEL_FONT = `bold ${LABEL_FONT_SIZE_PX}px "Red Hat Mono", monospace`;
 export const LABEL_PADDING_PX = 8; // horizontal padding on each side
+// Shared between the box outline (FlowerScene.tsx) and the nav label text
+// (NavPreviewBox.tsx) so they always match.
+export const MARKER_ACCENT_COLOR = "#5B1717";
 
 let measureCanvas: HTMLCanvasElement | undefined;
 

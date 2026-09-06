@@ -18,6 +18,18 @@ const BOX_SIZE = 90;
 // flower, purely for a bit of depth realism — 1 at the near clip, down to
 // this fraction at the far clip.
 const MIN_DEPTH_SCALE = 0.7;
+// Applied to every marker on top of its own offsetX/offsetY — for a
+// uniform nudge across all boxes at once, without touching each one.
+const GLOBAL_OFFSET_X = 0;
+const GLOBAL_OFFSET_Y = 160;
+// BOX_SIZE, GLOBAL_OFFSET_X/Y, and every marker's offsetX/offsetY above are
+// all tuned as pixel values against a viewport around this height (a normal
+// windowed browser). They're scaled by (actual height / this) below, so
+// going fullscreen — or any other viewport height — doesn't leave them
+// proportionally too small/large relative to the now-differently-sized
+// rendered flower. If the base sizing/offsets ever need recalibrating,
+// change this to whatever height you're actively tuning against.
+const REFERENCE_HEIGHT = 800;
 
 export type TrackedRect = {
   marker: Marker;
@@ -80,18 +92,23 @@ export function useTrackedBoxes(
         if (!projected) {
           return { marker, x: 0, y: 0, width: 0, height: 0, depth: 1, visible: false };
         }
+        const viewportScale = containerHeight / REFERENCE_HEIGHT;
         const depth = (projected.z + 1) / 2;
-        const sizeScale = 1 - depth * (1 - MIN_DEPTH_SCALE);
-        const height = BOX_SIZE * sizeScale;
+        const depthScale = 1 - depth * (1 - MIN_DEPTH_SCALE);
+        const baseSize = BOX_SIZE * viewportScale * depthScale * (marker.sizeScale ?? 1);
+        const height = baseSize * (marker.heightScale ?? 1);
         // A nav box widens past its normal size if it's too narrow to fit
-        // its label on one line — position math below stays centered on
-        // the same point either way.
-        const minWidthForLabel = marker.kind === "nav" ? measureLabelWidth(marker.label) + LABEL_PADDING_PX * 2 : 0;
-        const width = Math.max(BOX_SIZE * sizeScale, minWidthForLabel);
+        // its label on one line — unless the marker opts into wrapping the
+        // label across multiple lines instead, in which case the box just
+        // stays its normal size. Position math below stays centered on the
+        // same point either way.
+        const minWidthForLabel =
+          marker.kind === "nav" && !marker.wrapLabel ? measureLabelWidth(marker.label) + LABEL_PADDING_PX * 2 : 0;
+        const width = Math.max(baseSize, minWidthForLabel);
         return {
           marker,
-          x: projected.x - width / 2 + (marker.offsetX ?? 0),
-          y: projected.y - height / 2 + (marker.offsetY ?? 0),
+          x: projected.x - width / 2 + ((marker.offsetX ?? 0) + GLOBAL_OFFSET_X) * viewportScale,
+          y: projected.y - height / 2 + ((marker.offsetY ?? 0) + GLOBAL_OFFSET_Y) * viewportScale,
           width,
           height,
           depth,

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import type { Application } from "@splinetool/runtime";
 import { attachCursorCameraFollow } from "./cameraFollow";
+import { MARKER_ACCENT_COLOR } from "./labelFont";
 
 // `@splinetool/react-spline/next`'s Spline is an async function component
 // (it awaits a preview-hash fetch before rendering) — legal only inside a
@@ -15,6 +16,7 @@ const Spline = dynamic(() => import("@splinetool/react-spline"), { ssr: false })
 import { useTrackedBoxes } from "./useTrackedBoxes";
 import NavPreviewBox from "./NavPreviewBox";
 import TextureEffectBox from "./TextureEffectBox";
+import { HoverFigTreeVisual, HoverFigTreeClickCatcher } from "./HoverFigTree";
 
 const SCENE_URL = "https://prod.spline.design/pFFQjNMbfHZm6XIf/scene.splinecode";
 
@@ -30,15 +32,37 @@ export default function FlowerScene() {
 
   return (
     <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
+      {/* Behind the flower: no z-index, mounted before <Spline> in the DOM
+          so normal paint order puts Spline's canvas on top of it. */}
+      <HoverFigTreeVisual />
+
       <Spline
         scene={SCENE_URL}
+        // Explicit position+z-index: Spline's own wrapper div is
+        // unpositioned (position: static), so without this it would
+        // paint *behind* HoverFigTreeVisual regardless of DOM order —
+        // CSS stacks any positioned sibling (even z-index: auto) above
+        // in-flow static content no matter which comes first in markup.
+        style={{ position: "relative", zIndex: 1 }}
         onLoad={(app) => {
           appRef.current = app;
+          // Scene otherwise renders its own opaque background (it just
+          // happens to match the page's bg-black, so this went unnoticed
+          // until hover-fig-tree needed to show through from behind) —
+          // make it transparent so only the flower geometry itself is
+          // opaque and the overlay behind it can show through everywhere
+          // else.
+          app.setBackgroundColor("transparent");
           if (containerRef.current) {
             cameraFollowCleanupRef.current = attachCursorCameraFollow(app, containerRef.current);
           }
         }}
       />
+
+      {/* Above the flower canvas but below the nav-marker boxes (z-10) —
+          catches a click anywhere else on the page while the overlay is up
+          and routes to the fig-tree case study. */}
+      <HoverFigTreeClickCatcher />
 
       {/* Overlay layer: pointer events pass through except on the boxes
           themselves. Camera orbit is now driven entirely by cursor position
@@ -65,10 +89,9 @@ export default function FlowerScene() {
               top: rect.y,
               width: rect.width,
               height: rect.height,
-              opacity: rect.visible ? 1 - rect.depth * 0.4 : 0,
+              opacity: rect.visible ? 1 : 0,
               visibility: rect.visible ? "visible" : "hidden",
-              borderColor: "#b99d88",
-              backgroundColor: rect.marker.kind === "nav" ? "rgba(128, 0, 0, 0.5)" : undefined,
+              borderColor: MARKER_ACCENT_COLOR,
             }}
           >
             {rect.marker.kind === "nav" ? (

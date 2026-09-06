@@ -4,26 +4,36 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { NavMarker } from "./markers";
-import { LABEL_FONT_SIZE_PX } from "./labelFont";
+import { LABEL_FONT_SIZE_PX, MARKER_ACCENT_COLOR } from "./labelFont";
+import { useHoverFigTree } from "./HoverFigTreeContext";
 
 const VIDEO_EXTENSIONS = [".mp4", ".mov", ".webm"];
 const isVideo = (src: string) => VIDEO_EXTENSIONS.some((ext) => src.toLowerCase().endsWith(ext));
 
 export default function NavPreviewBox({ marker, size }: { marker: NavMarker; size: number }) {
   const [hovered, setHovered] = useState(false);
+  const { activate } = useHoverFigTree();
 
   return (
     <Link
       href={marker.href}
       className="pointer-events-auto relative block h-full w-full"
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => {
+        setHovered(true);
+        if (marker.triggersHoverOverlay) activate();
+      }}
       onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
+      onFocus={() => {
+        setHovered(true);
+        if (marker.triggersHoverOverlay) activate();
+      }}
       onBlur={() => setHovered(false)}
     >
       <span
-        className="font-red-hat-mono pointer-events-none absolute left-0 top-0 whitespace-nowrap px-2 py-1 text-left font-bold uppercase leading-none text-white"
-        style={{ fontSize: LABEL_FONT_SIZE_PX }}
+        className={`font-red-hat-mono pointer-events-none absolute left-0 top-0 px-2 py-1 text-left font-bold uppercase leading-tight ${
+          marker.wrapLabel ? "w-full break-words" : "whitespace-nowrap"
+        }`}
+        style={{ fontSize: LABEL_FONT_SIZE_PX, color: MARKER_ACCENT_COLOR }}
       >
         {marker.label}
       </span>
