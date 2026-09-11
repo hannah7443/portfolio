@@ -17,6 +17,8 @@ import { useTrackedBoxes } from "./useTrackedBoxes";
 import NavPreviewBox from "./NavPreviewBox";
 import TextureEffectBox from "./TextureEffectBox";
 import { HoverFigTreeVisual, HoverFigTreeClickCatcher } from "./HoverFigTree";
+import { HoverRadioVisual, HoverRadioClickCatcher } from "./HoverRadio";
+import { HomeBackground } from "./HomeBackground";
 
 const SCENE_URL = "https://prod.spline.design/pFFQjNMbfHZm6XIf/scene.splinecode";
 
@@ -33,8 +35,13 @@ export default function FlowerScene() {
   return (
     <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
       {/* Behind the flower: no z-index, mounted before <Spline> in the DOM
-          so normal paint order puts Spline's canvas on top of it. */}
+          so normal paint order puts Spline's canvas on top of it.
+          HomeBackground goes first (furthest back) since it's always
+          visible — HoverFigTreeVisual/HoverRadioVisual paint over it with
+          their own opaque bg-black whenever a hover overlay is active. */}
+      <HomeBackground />
       <HoverFigTreeVisual />
+      <HoverRadioVisual />
 
       <Spline
         scene={SCENE_URL}
@@ -63,6 +70,7 @@ export default function FlowerScene() {
           catches a click anywhere else on the page while the overlay is up
           and routes to the fig-tree case study. */}
       <HoverFigTreeClickCatcher />
+      <HoverRadioClickCatcher />
 
       {/* Overlay layer: pointer events pass through except on the boxes
           themselves. Camera orbit is now driven entirely by cursor position

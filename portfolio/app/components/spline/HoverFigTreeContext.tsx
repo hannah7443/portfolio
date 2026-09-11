@@ -1,24 +1,71 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useRef, useState, type ReactNode } from "react";
 
-// Shared "is the hover-fig-tree overlay showing" flag. It's lifted out of
-// NavPreviewBox (which only knows about its own single marker) so the
-// fig-tree marker's hover can set it sticky, while the full-screen overlay
-// and its click-catcher — both siblings under FlowerScene — can read it.
+// Shared "which hover overlay is showing" state. It's lifted out of
+// NavPreviewBox (which only knows about its own single marker) so any nav
+// marker's hover can set the matching full-screen background sticky, while
+// the overlay components and their click-catchers — all siblings under
+// FlowerScene — can read it. Only one overlay id can be active at a time:
+// activating a new one simply replaces the old id, which is exactly the
+// "stays up until you hover another nav marker" behavior each overlay wants.
+export type HoverOverlayId = "fig-tree" | "radio";
+
 type HoverFigTreeContextValue = {
-  active: boolean;
-  activate: () => void;
+  /** id of the currently-active overlay, or null if none is showing. */
+  active: HoverOverlayId | null;
+  activate: (id: HoverOverlayId) => void;
   deactivate: () => void;
+  /**
+   * How far each overlay's content is scrolled (in real screen px, already
+   * post-scale), keyed by overlay id. A ClickCatcher (the full-screen layer
+   * that actually receives wheel events, since it sits above the Spline
+   * canvas) reports wheel deltas via `addScroll`; the matching Visual
+   * component reads its own `scrollOffset[id]` back to shift its content —
+   * the two are separate DOM elements (Visual must stay behind the Spline
+   * canvas, ClickCatcher above it) with no direct prop channel, so this
+   * context is what connects them.
+   */
+  scrollOffset: Partial<Record<HoverOverlayId, number>>;
+  /** Visual calls this whenever it remeasures, so `addScroll` always clamps against the current content height. */
+  setMaxScroll: (id: HoverOverlayId, max: number) => void;
+  /** ClickCatcher calls this with a wheel event's deltaY. */
+  addScroll: (id: HoverOverlayId, delta: number) => void;
 };
 
 const HoverFigTreeContext = createContext<HoverFigTreeContextValue | null>(null);
 
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+
 export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
-  const [active, setActive] = useState(false);
+  const [active, setActiveState] = useState<HoverOverlayId | null>(null);
+  const [scrollOffset, setScrollOffset] = useState<Partial<Record<HoverOverlayId, number>>>({});
+  const maxScrollRef = useRef<Partial<Record<HoverOverlayId, number>>>({});
+
+  const activate = (id: HoverOverlayId) => {
+    setActiveState(id);
+    // Start each fresh activation scrolled to the top, rather than wherever
+    // it was left the last time this overlay was shown.
+    setScrollOffset((prev) => ({ ...prev, [id]: 0 }));
+  };
+
+  const setMaxScroll = (id: HoverOverlayId, max: number) => {
+    maxScrollRef.current[id] = max;
+    setScrollOffset((prev) => {
+      const current = prev[id] ?? 0;
+      const next = clamp(current, 0, max);
+      return next === current ? prev : { ...prev, [id]: next };
+    });
+  };
+
+  const addScroll = (id: HoverOverlayId, delta: number) => {
+    const max = maxScrollRef.current[id] ?? 0;
+    setScrollOffset((prev) => ({ ...prev, [id]: clamp((prev[id] ?? 0) + delta, 0, max) }));
+  };
+
   return (
     <HoverFigTreeContext.Provider
-      value={{ active, activate: () => setActive(true), deactivate: () => setActive(false) }}
+      value={{ active, activate, deactivate: () => setActiveState(null), scrollOffset, setMaxScroll, addScroll }}
     >
       {children}
     </HoverFigTreeContext.Provider>

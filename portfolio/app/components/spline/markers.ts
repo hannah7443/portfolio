@@ -4,6 +4,8 @@
  * Spline. Adding a new tracker later: duplicate a layer in Spline, rename
  * it, then add one entry here — no other code needs to change.
  */
+import type { HoverOverlayId } from "./HoverFigTreeContext";
+
 type MarkerOffset = {
   /**
    * Fine-tuning nudge in screen pixels, applied on top of the computed
@@ -33,11 +35,13 @@ export type NavMarker = MarkerOffset & {
    */
   wrapLabel?: boolean;
   /**
-   * On hover, sticks the full-screen hover-fig-tree design (see
-   * HoverFigTree.tsx) on behind the flower — it stays up after the cursor
-   * leaves this box until the user navigates to another nav marker's page.
+   * On hover, sticks the matching full-screen hover overlay design (see
+   * HoverFigTree.tsx / HoverRadio.tsx) on behind the flower — it stays up
+   * after the cursor leaves this box until the user hovers another nav
+   * marker with a `triggersHoverOverlay` of its own (which swaps in that
+   * marker's overlay instead).
    */
-  triggersHoverOverlay?: boolean;
+  triggersHoverOverlay?: HoverOverlayId;
 };
 
 export type TextureMarker = MarkerOffset & {
@@ -76,7 +80,7 @@ export const MARKERS: Marker[] = [
     heightScale: 0.7,
     offsetY: 35,
     offsetX: 7,
-    triggersHoverOverlay: true,
+    triggersHoverOverlay: "fig-tree",
   },
   {
     kind: "nav",
@@ -89,6 +93,7 @@ export const MARKERS: Marker[] = [
     offsetY: 50,
     wrapLabel: true,
     sizeScale: 1.5,
+    triggersHoverOverlay: "radio",
   },
 
   // Decorative slots actually authored in the scene. Only two effects are

@@ -20,12 +20,12 @@ export default function NavPreviewBox({ marker, size }: { marker: NavMarker; siz
       className="pointer-events-auto relative block h-full w-full"
       onMouseEnter={() => {
         setHovered(true);
-        if (marker.triggersHoverOverlay) activate();
+        if (marker.triggersHoverOverlay) activate(marker.triggersHoverOverlay);
       }}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => {
         setHovered(true);
-        if (marker.triggersHoverOverlay) activate();
+        if (marker.triggersHoverOverlay) activate(marker.triggersHoverOverlay);
       }}
       onBlur={() => setHovered(false)}
     >

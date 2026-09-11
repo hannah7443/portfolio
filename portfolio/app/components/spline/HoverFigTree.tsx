@@ -30,7 +30,8 @@ const QUOTE_ICONS_WIDTH = "19vw";
  * clicks always fall through to whatever's above it.
  */
 export function HoverFigTreeVisual() {
-  const { active } = useHoverFigTree();
+  const { active, scrollOffset, setMaxScroll } = useHoverFigTree();
+  const isActive = active === "fig-tree";
   const outerRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
@@ -62,18 +63,27 @@ export function HoverFigTreeVisual() {
       const content = contentRef.current;
       if (!outer || !content) return;
       const fitRatio = outer.clientHeight / content.scrollHeight;
-      setScale(Math.min(1, fitRatio * NON_FULLSCREEN_BOOST));
+      const nextScale = Math.min(1, fitRatio * NON_FULLSCREEN_BOOST);
+      setScale(nextScale);
+      // Even after the shrink above, content can still be taller than the
+      // available box (BOOST intentionally overshoots "just barely fits",
+      // and a very tall window can still outgrow it) — rather than clip
+      // that remainder, this reports how much extra height there is left
+      // to a shared scroll offset (see HoverFigTreeContext) that
+      // HoverFigTreeClickCatcher's wheel handler drives.
+      const renderedHeight = content.scrollHeight * nextScale;
+      setMaxScroll("fig-tree", Math.max(0, renderedHeight - outer.clientHeight));
     };
     recompute();
     window.addEventListener("resize", recompute);
     return () => window.removeEventListener("resize", recompute);
-  }, []);
+  }, [setMaxScroll]);
 
   return (
     <div
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-black transition-opacity duration-300"
-      style={{ opacity: active ? 1 : 0 }}
-      aria-hidden={!active}
+      style={{ opacity: isActive ? 1 : 0 }}
+      aria-hidden={!isActive}
       data-name="hover-fig-tree"
     >
       <div
@@ -84,7 +94,11 @@ export function HoverFigTreeVisual() {
         {/* The title + two-column content, scaled as one unit (see `scale`
             above) — relative alignment between every element inside is
             untouched no matter what the scale ends up being. */}
-        <div ref={contentRef} className="w-full" style={{ transform: `scale(${scale})`, transformOrigin: "center" }}>
+        <div
+          ref={contentRef}
+          className="w-full"
+          style={{ transform: `translateY(${-(scrollOffset["fig-tree"] ?? 0)}px) scale(${scale})`, transformOrigin: "center" }}
+        >
         <p
           className="font-karla shrink-0 font-bold uppercase text-white"
           style={{ fontSize: "3.2vw", letterSpacing: "0.32vw", lineHeight: 1.1, marginLeft: "-2vw", marginTop: "1vw" }}
@@ -237,17 +251,26 @@ export function HoverFigTreeVisual() {
  * the fig-tree case study.
  */
 export function HoverFigTreeClickCatcher() {
-  const { active, deactivate } = useHoverFigTree();
+  const { active, deactivate, addScroll } = useHoverFigTree();
+  const isActive = active === "fig-tree";
   const router = useRouter();
 
   return (
     <div
       className="absolute inset-0"
-      style={{ zIndex: 5, pointerEvents: active ? "auto" : "none", cursor: active ? "pointer" : undefined }}
-      aria-hidden={!active}
+      style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none", cursor: isActive ? "pointer" : undefined }}
+      aria-hidden={!isActive}
       onClick={() => {
         deactivate();
         router.push("/work/fig-tree");
+      }}
+      // This sits above the Spline canvas specifically so clicks reach it
+      // instead of Spline's own camera controls — which also means it's
+      // the element that has to forward scroll-wheel input down to
+      // HoverFigTreeVisual (a separate element kept *behind* the canvas so
+      // the flower still occludes it), via the shared scroll offset.
+      onWheel={(e) => {
+        if (isActive) addScroll("fig-tree", e.deltaY);
       }}
     />
   );
