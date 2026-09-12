@@ -38,7 +38,10 @@ export default function NavPreviewBox({ marker, size }: { marker: NavMarker; siz
         {marker.label}
       </span>
 
-      {hovered && (
+      {/* Only for markers without their own full-screen hover overlay —
+          markers with `triggersHoverOverlay` predate those overlays and
+          don't need this small thumbnail popup anymore. */}
+      {hovered && !marker.triggersHoverOverlay && (
         <div
           className="font-red-hat-mono pointer-events-none absolute z-10 flex flex-col gap-2 border border-black/40 bg-[var(--background)] p-2 shadow-lg"
           style={{

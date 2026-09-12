@@ -17,7 +17,10 @@ import { useTrackedBoxes } from "./useTrackedBoxes";
 import NavPreviewBox from "./NavPreviewBox";
 import TextureEffectBox from "./TextureEffectBox";
 import { HoverFigTreeVisual, HoverFigTreeClickCatcher } from "./HoverFigTree";
+import { HoverAboutVisual, HoverAboutClickCatcher } from "./HoverAbout";
 import { HoverRadioVisual, HoverRadioClickCatcher } from "./HoverRadio";
+import { HoverPlaygroundVisual, HoverPlaygroundLinks, HoverPlaygroundClickCatcher } from "./HoverPlayground";
+import { PlaygroundVideoOverlay } from "./PlaygroundVideoOverlay";
 import { HomeBackground } from "./HomeBackground";
 
 const SCENE_URL = "https://prod.spline.design/pFFQjNMbfHZm6XIf/scene.splinecode";
@@ -41,7 +44,9 @@ export default function FlowerScene() {
           their own opaque bg-black whenever a hover overlay is active. */}
       <HomeBackground />
       <HoverFigTreeVisual />
+      <HoverAboutVisual />
       <HoverRadioVisual />
+      <HoverPlaygroundVisual />
 
       <Spline
         scene={SCENE_URL}
@@ -70,7 +75,15 @@ export default function FlowerScene() {
           catches a click anywhere else on the page while the overlay is up
           and routes to the fig-tree case study. */}
       <HoverFigTreeClickCatcher />
+      <HoverAboutClickCatcher />
       <HoverRadioClickCatcher />
+      <HoverPlaygroundClickCatcher />
+
+      {/* Above the click-catchers (z-5) but below the nav-marker boxes
+          (z-10) — the actual clickable @handle links in HoverPlayground's
+          "WELCOME TO MY MOSAIC OF CREATIVITY" box (see HoverPlayground.tsx
+          for why these can't just live inside HoverPlaygroundVisual). */}
+      <HoverPlaygroundLinks />
 
       {/* Overlay layer: pointer events pass through except on the boxes
           themselves. Camera orbit is now driven entirely by cursor position
@@ -110,6 +123,10 @@ export default function FlowerScene() {
           </div>
         ))}
       </div>
+
+      {/* Above absolutely everything (including the nav-marker boxes) —
+          the modal opened by clicking a HoverPlayground video tile. */}
+      <PlaygroundVideoOverlay />
     </div>
   );
 }

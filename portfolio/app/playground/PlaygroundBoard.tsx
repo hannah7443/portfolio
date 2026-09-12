@@ -89,7 +89,7 @@ const ARTWORKS: Artwork[] = [
   },
   {
     id: "Memories",
-    src: "/artwork/Memories.mov",
+    src: "/artwork/Memories.mp4",
     left: 86,
     top: 584,
     width: 187,

@@ -29,3 +29,15 @@ body {
   font-weight: 400;
   font-style: italic;
 }
+
+/* HoverAbout's continuously-scrolling photo belt: the track renders its
+   clusters twice back to back, and this animates exactly one copy's width
+   (-50%) so the loop point is seamless. */
+@keyframes belt-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}

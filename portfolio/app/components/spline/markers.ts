@@ -62,6 +62,7 @@ export const MARKERS: Marker[] = [
     offsetX: 5,
     offsetY: 0,
     heightScale: 0.6,
+    triggersHoverOverlay: "about",
   },
   {
     kind: "nav",
@@ -70,6 +71,7 @@ export const MARKERS: Marker[] = [
     label: "playground",
     thumbnail: "/artwork/Mary-Oliver.MOV",
     heightScale: 0.7,
+    triggersHoverOverlay: "playground",
   },
   {
     kind: "nav",

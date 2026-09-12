@@ -9,7 +9,7 @@ import { createContext, useContext, useRef, useState, type ReactNode } from "rea
 // FlowerScene — can read it. Only one overlay id can be active at a time:
 // activating a new one simply replaces the old id, which is exactly the
 // "stays up until you hover another nav marker" behavior each overlay wants.
-export type HoverOverlayId = "fig-tree" | "radio";
+export type HoverOverlayId = "fig-tree" | "radio" | "playground" | "about";
 
 type HoverFigTreeContextValue = {
   /** id of the currently-active overlay, or null if none is showing. */
@@ -31,6 +31,18 @@ type HoverFigTreeContextValue = {
   setMaxScroll: (id: HoverOverlayId, max: number) => void;
   /** ClickCatcher calls this with a wheel event's deltaY. */
   addScroll: (id: HoverOverlayId, delta: number) => void;
+  /**
+   * Which HoverPlayground video tile (by name) the "click a video" detail
+   * overlay is showing for, or null when it's closed. Lives here (rather
+   * than local state in one component) for the same reason as
+   * `scrollOffset` above: the thing that has to detect the click (a hit
+   * target stacked above the Spline canvas) and the thing that renders the
+   * overlay (mounted at the very top of FlowerScene, above everything) are
+   * different components.
+   */
+  playgroundOverlayTile: string | null;
+  openPlaygroundOverlay: (name: string) => void;
+  closePlaygroundOverlay: () => void;
 };
 
 const HoverFigTreeContext = createContext<HoverFigTreeContextValue | null>(null);
@@ -41,6 +53,7 @@ export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
   const [active, setActiveState] = useState<HoverOverlayId | null>(null);
   const [scrollOffset, setScrollOffset] = useState<Partial<Record<HoverOverlayId, number>>>({});
   const maxScrollRef = useRef<Partial<Record<HoverOverlayId, number>>>({});
+  const [playgroundOverlayTile, setPlaygroundOverlayTile] = useState<string | null>(null);
 
   const activate = (id: HoverOverlayId) => {
     setActiveState(id);
@@ -65,7 +78,17 @@ export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
 
   return (
     <HoverFigTreeContext.Provider
-      value={{ active, activate, deactivate: () => setActiveState(null), scrollOffset, setMaxScroll, addScroll }}
+      value={{
+        active,
+        activate,
+        deactivate: () => setActiveState(null),
+        scrollOffset,
+        setMaxScroll,
+        addScroll,
+        playgroundOverlayTile,
+        openPlaygroundOverlay: setPlaygroundOverlayTile,
+        closePlaygroundOverlay: () => setPlaygroundOverlayTile(null),
+      }}
     >
       {children}
     </HoverFigTreeContext.Provider>
