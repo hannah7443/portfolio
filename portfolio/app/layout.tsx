@@ -30,8 +30,14 @@ export default function RootLayout({
     >
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/hdq7wey.css" />
+        {/* Warms the connection to Spline's scene host (and its asset CDN)
+            before the homepage's dynamically-imported Spline runtime even
+            starts fetching — DNS/TLS is otherwise paid for cold, serially
+            after the runtime JS chunk arrives. */}
+        <link rel="preconnect" href="https://prod.spline.design" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://unpkg.com" crossOrigin="anonymous" />
       </head>
-      <body className="relative min-h-full flex flex-col">
+      <body className="relative min-h-full flex flex-col" suppressHydrationWarning>
         <Nav />
         {children}
       </body>

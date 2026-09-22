@@ -14,21 +14,22 @@ export default function NavPreviewBox({ marker, size }: { marker: NavMarker; siz
   const [hovered, setHovered] = useState(false);
   const { activate } = useHoverFigTree();
 
-  return (
-    <Link
-      href={marker.href}
-      className="pointer-events-auto relative block h-full w-full"
-      onMouseEnter={() => {
-        setHovered(true);
-        if (marker.triggersHoverOverlay) activate(marker.triggersHoverOverlay);
-      }}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => {
-        setHovered(true);
-        if (marker.triggersHoverOverlay) activate(marker.triggersHoverOverlay);
-      }}
-      onBlur={() => setHovered(false)}
-    >
+  const handlers = {
+    className: "pointer-events-auto relative block h-full w-full",
+    onMouseEnter: () => {
+      setHovered(true);
+      if (marker.triggersHoverOverlay) activate(marker.triggersHoverOverlay);
+    },
+    onMouseLeave: () => setHovered(false),
+    onFocus: () => {
+      setHovered(true);
+      if (marker.triggersHoverOverlay) activate(marker.triggersHoverOverlay);
+    },
+    onBlur: () => setHovered(false),
+  };
+
+  const content = (
+    <>
       <span
         className={`font-red-hat-mono pointer-events-none absolute left-0 top-0 px-2 py-1 text-left font-bold uppercase leading-tight ${
           marker.wrapLabel ? "w-full break-words" : "whitespace-nowrap"
@@ -61,6 +62,24 @@ export default function NavPreviewBox({ marker, size }: { marker: NavMarker; siz
           <span className="text-sm">{marker.label}</span>
         </div>
       )}
+    </>
+  );
+
+  // `disabled` markers have no finished destination page yet — same hover
+  // overlay trigger as any other marker, just never navigable. Rendered as
+  // a plain div (not tabbable) instead of a <Link> with an href that goes
+  // nowhere useful.
+  if (marker.disabled) {
+    return (
+      <div {...handlers} tabIndex={-1}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={marker.href} {...handlers}>
+      {content}
     </Link>
   );
 }

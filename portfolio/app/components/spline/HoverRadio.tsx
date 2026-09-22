@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useHoverFigTree } from "./HoverFigTreeContext";
 
 // Figma "Frame17" (node 463:1519), re-laid-out the same way HoverFigTree.tsx
@@ -280,12 +279,14 @@ function VinylCluster() {
 }
 
 /**
- * The visual design itself — sits behind the 3D flower (mount it before
- * <Spline> in the DOM, no z-index, so normal paint order puts Spline's
- * canvas on top of it). Purely decorative: pointer-events are left off so
- * clicks always fall through to whatever's above it.
+ * The full WXDU case-study layout — built, but not wired up as the live
+ * "radio" hover overlay yet (see HoverRadioVisual below, which shows a
+ * "coming soon" cursor badge instead until /work/radio is ready to link to
+ * for real). Parked here rather than deleted: unused for now, but kept
+ * exported so it isn't dead code and can be dropped back in wholesale once
+ * the case study is ready to ship.
  */
-export function HoverRadioVisual() {
+export function RadioCaseStudyContent() {
   const { active, scrollOffset, setMaxScroll } = useHoverFigTree();
   const isActive = active === "radio";
   const outerRef = useRef<HTMLDivElement | null>(null);
@@ -476,34 +477,43 @@ export function HoverRadioVisual() {
 }
 
 /**
+ * The live "radio" hover overlay — just a black backdrop (matching the
+ * other overlays' full-bleed treatment) while the case study itself isn't
+ * ready to show. The actual "coming soon" messaging is the cursor-follow
+ * badge rendered by ComingSoonCursor, mounted separately in FlowerScene.tsx
+ * so it can track the pointer independently of this backdrop's fade.
+ */
+export function HoverRadioVisual() {
+  const { active } = useHoverFigTree();
+  const isActive = active === "radio";
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-0 bg-black transition-opacity duration-300"
+      style={{ opacity: isActive ? 1 : 0 }}
+      aria-hidden={!isActive}
+      data-name="hover-radio"
+    />
+  );
+}
+
+/**
  * Invisible full-screen hit target that only turns on while the overlay is
  * active. Mounted above the Spline canvas but below the nav-marker boxes
  * (z-index between the two) so a click on an actual nav box still goes to
- * that box's own Link, while a click anywhere else on the page navigates to
- * the full-stack case study.
+ * that box's own Link. The case study isn't linkable yet, so a click here
+ * just closes the overlay instead of navigating anywhere.
  */
 export function HoverRadioClickCatcher() {
-  const { active, deactivate, addScroll } = useHoverFigTree();
+  const { active, deactivate } = useHoverFigTree();
   const isActive = active === "radio";
-  const router = useRouter();
 
   return (
     <div
       className="absolute inset-0"
-      style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none", cursor: isActive ? "pointer" : undefined }}
+      style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none" }}
       aria-hidden={!isActive}
-      onClick={() => {
-        deactivate();
-        router.push("/full-stack");
-      }}
-      // Sits above the Spline canvas so clicks reach it instead of Spline's
-      // own camera controls — which also means it's the element that has
-      // to forward scroll-wheel input down to HoverRadioVisual (kept
-      // behind the canvas so the flower still occludes it), via the shared
-      // scroll offset.
-      onWheel={(e) => {
-        if (isActive) addScroll("radio", e.deltaY);
-      }}
+      onClick={() => deactivate()}
     />
   );
 }

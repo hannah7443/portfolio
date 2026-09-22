@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useHoverFigTree } from "./HoverFigTreeContext";
 
 // Figma "playground" (node 526:45), reproduced as one fixed-aspect collage
@@ -54,10 +53,11 @@ export const VIDEO_TILES: VideoTile[] = [
   // (RIGHT_EDGE_X - 212 ≈ 1130.6) so it doesn't overlap it.
   { name: "shadow-puppets", src: "/artwork/Shadow-Puppets.MP4", box: { x: 768, y: 475, w: 327, h: 183 } },
   // w/h scaled up 8%, x kept at LEFT_EDGE_X so its left margin is
-  // unchanged — new bottom (138+220.32=358.32) still clears the
-  // "Currently Exploring..." box's top (373), and new right
-  // (-28.6+392.04=363.4) still clears mary-oliver's left edge (426).
-  { name: "september-rain", src: "/artwork/September-Rain.MP4", box: { x: LEFT_EDGE_X, y: 138, w: 392.04, h: 220.32 } },
+  // unchanged. y shifted down (+40, matching EXPLORING_BOX's own +40 move
+  // below) — new bottom (178+220.32=398.32) still clears the "Currently
+  // Exploring..." box's new top (413), and new right (-28.6+392.04=363.4)
+  // still clears mary-oliver's left edge (426).
+  { name: "september-rain", src: "/artwork/September-Rain.MP4", box: { x: LEFT_EDGE_X, y: 178, w: 392.04, h: 220.32 } },
   // y shifted down (+35), same reasoning as shadow-puppets — it also
   // overlapped weird-fishes horizontally (both sit against RIGHT_EDGE_X).
   { name: "memories", src: "/artwork/Memories.mp4", box: { x: RIGHT_EDGE_X - 212, y: 469, w: 212, h: 379 } },
@@ -70,8 +70,10 @@ export const VIDEO_TILES: VideoTile[] = [
 ];
 
 // w extended so its right edge (x+w) matches cowboys-angels's own right
-// edge (311+266=577).
-const EXPLORING_BOX: Box = { x: LEFT_EDGE_X, y: 373, w: 577 - LEFT_EDGE_X, h: 182 };
+// edge (311+266=577). y shifted down (+40) and h shortened (-50) — moves
+// the box down while making it shorter overall (top drops 40, bottom rises
+// from 555 to 545 — still clear of rilkean-heart's top at 571).
+const EXPLORING_BOX: Box = { x: LEFT_EDGE_X, y: 413, w: 577 - LEFT_EDGE_X, h: 132 };
 // x pulled back in from 768 so its left edge (800) clears mary-oliver's
 // right edge (426+359.64=785.64) instead of overlapping it, keeping the
 // right edge at RIGHT_EDGE_X (so w shrinks along with it).
@@ -322,23 +324,20 @@ export function HoverPlaygroundLinks() {
  * Invisible full-screen hit target that only turns on while the overlay is
  * active. Mounted above the Spline canvas but below the nav-marker boxes
  * (z-index between the two) so a click on an actual nav box still goes to
- * that box's own Link, while a click anywhere else on the page navigates to
- * the playground page.
+ * that box's own Link. This overlay is the only playground experience
+ * (there's no standalone destination page to navigate to) — a background
+ * click just closes it.
  */
 export function HoverPlaygroundClickCatcher() {
   const { active, deactivate, addScroll } = useHoverFigTree();
   const isActive = active === "playground";
-  const router = useRouter();
 
   return (
     <div
       className="absolute inset-0"
       style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none", cursor: isActive ? "pointer" : undefined }}
       aria-hidden={!isActive}
-      onClick={() => {
-        deactivate();
-        router.push("/playground");
-      }}
+      onClick={() => deactivate()}
       onWheel={(e) => {
         if (isActive) addScroll("playground", e.deltaY);
       }}

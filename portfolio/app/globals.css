@@ -41,3 +41,57 @@ body {
     transform: translate3d(-50%, 0, 0);
   }
 }
+
+/* ComingSoonCursor's dot→pill reveal, translated from the Figma motion
+   prototype (Radio-Motion-Design, node 94:366): opacity fades in over the
+   first ~7% of the source's 2s loop (times [0, 0.0712, 1], ease "easeOut"),
+   width holds at 54px through that same point then grows linearly to its
+   final width by ~29% (times [0.0712, 0.2874]). Re-timed to a single 0.6s
+   play-once run (matching the source's own ~0.575s width-grow midpoint)
+   instead of the source's `repeat: Infinity` loop — this plays once per
+   hover-enter and holds at its final (fully expanded) state via
+   `forwards`, since the Figma loop is a prototyping-timeline convenience,
+   not the intended steady-state UI. Final width tightened from the
+   source's 233px (sized for its 28px text) to 140px, to match this
+   component's smaller 14px label without excess left/right padding. */
+@keyframes coming-soon-reveal {
+  0% {
+    opacity: 0;
+    width: 54px;
+  }
+  12% {
+    opacity: 1;
+    width: 54px;
+  }
+  48% {
+    opacity: 1;
+    width: 140px;
+  }
+  100% {
+    opacity: 1;
+    width: 140px;
+  }
+}
+
+/* Same reveal as coming-soon-reveal above, just with a wider final width
+   for ReadCaseStudyCursor's longer "READ FULL CASE STUDY" label — 140px
+   (tuned for the ~11-character "Coming soon"/"Return home" labels) clips
+   this one's ~21 characters. */
+@keyframes case-study-reveal {
+  0% {
+    opacity: 0;
+    width: 54px;
+  }
+  12% {
+    opacity: 1;
+    width: 54px;
+  }
+  48% {
+    opacity: 1;
+    width: 260px;
+  }
+  100% {
+    opacity: 1;
+    width: 260px;
+  }
+}

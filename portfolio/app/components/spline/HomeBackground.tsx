@@ -23,23 +23,56 @@ const WORD_CYCLE = ["musician", "designer", "experimenter", "artist"];
 const REPEAT_COUNT = 40;
 const REPEATED_WORDS = Array.from({ length: REPEAT_COUNT }, (_, i) => WORD_CYCLE[i % WORD_CYCLE.length]);
 
-const LINES: { highlight: string }[] = [
-  { highlight: "designer" },
-  { highlight: "artist" },
-  { highlight: "experimenter" },
-  { highlight: "musician" },
+// Top to bottom: left, right, left, right.
+const LINES: { highlight: string; direction: "left" | "right" }[] = [
+  { highlight: "designer", direction: "left" },
+  { highlight: "artist", direction: "right" },
+  { highlight: "experimenter", direction: "left" },
+  { highlight: "musician", direction: "right" },
 ];
 
-function RepeatingLine({ highlight }: { highlight: string }) {
+function WordRun({ highlight }: { highlight: string }) {
   return (
-    <p className="font-sans whitespace-nowrap text-white" style={{ fontSize: "3.8vw", letterSpacing: "-0.09vw", lineHeight: 1 }}>
+    <p
+      className="font-sans shrink-0 whitespace-nowrap text-white"
+      style={{ fontSize: "3.8vw", letterSpacing: "-0.09vw", lineHeight: 1 }}
+    >
       {REPEATED_WORDS.map((word, i) => (
         <span key={i} style={{ opacity: word === highlight ? 1 : 0.6 }}>
           {word}
           {i < REPEATED_WORDS.length - 1 ? " " : ""}
         </span>
       ))}
+      {" "}
     </p>
+  );
+}
+
+/**
+ * Continuously-scrolling line — same technique as HoverAbout's PhotoBelt:
+ * the track renders two copies of the word run back to back and animates
+ * exactly one copy's width (-50%, via the `belt-scroll` keyframes in
+ * globals.css) so the loop is seamless. `direction: "right"` plays the
+ * same keyframes in reverse (CSS `animation-direction: reverse`, i.e.
+ * -50%→0% instead of 0%→-50%) rather than needing a second keyframe set,
+ * since reversing 0%→-50% is exactly a rightward scroll.
+ */
+function RepeatingLine({ highlight, direction }: { highlight: string; direction: "left" | "right" }) {
+  return (
+    <div className="overflow-hidden" style={{ width: "300vw" }}>
+      <div
+        className="flex"
+        style={{
+          width: "max-content",
+          animation: "belt-scroll 160s linear infinite",
+          animationDirection: direction === "right" ? "reverse" : "normal",
+          willChange: "transform",
+        }}
+      >
+        <WordRun highlight={highlight} />
+        <WordRun highlight={highlight} />
+      </div>
+    </div>
   );
 }
 
@@ -64,12 +97,12 @@ export function NameTitle() {
   );
 }
 
-/** The 4 lines of repeating "musician designer experimenter artist". */
+/** The 4 lines of repeating "musician designer experimenter artist" — alternating scroll direction per line (see LINES above). */
 export function RepeatingWordLines() {
   return (
-    <div className="flex flex-col" style={{ gap: "0.3vw", width: "300vw" }}>
-      {LINES.map(({ highlight }) => (
-        <RepeatingLine key={highlight} highlight={highlight} />
+    <div className="flex flex-col" style={{ gap: "0.3vw" }}>
+      {LINES.map(({ highlight, direction }) => (
+        <RepeatingLine key={highlight} highlight={highlight} direction={direction} />
       ))}
     </div>
   );

@@ -42,6 +42,13 @@ export type NavMarker = MarkerOffset & {
    * marker's overlay instead).
    */
   triggersHoverOverlay?: HoverOverlayId;
+  /**
+   * Renders the box as a plain (non-navigating) div instead of a Link —
+   * for a marker whose overlay is a hover-only preview with no finished
+   * destination page to click into yet. Hover/overlay behavior is
+   * unaffected; only the click-through is disabled. Omit for false.
+   */
+  disabled?: boolean;
 };
 
 export type TextureMarker = MarkerOffset & {
@@ -72,6 +79,7 @@ export const MARKERS: Marker[] = [
     thumbnail: "/artwork/Mary-Oliver.MOV",
     heightScale: 0.7,
     triggersHoverOverlay: "playground",
+    disabled: true,
   },
   {
     kind: "nav",
@@ -96,6 +104,7 @@ export const MARKERS: Marker[] = [
     wrapLabel: true,
     sizeScale: 1.5,
     triggersHoverOverlay: "radio",
+    disabled: true,
   },
 
   // Decorative slots actually authored in the scene. Only two effects are

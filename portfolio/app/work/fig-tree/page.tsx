@@ -93,7 +93,7 @@ export default function FigTreePage() {
       />
 
       <Link
-        href="/work"
+        href="/"
         className="font-red-hat-mono fixed left-8 top-8 z-30 flex items-center gap-2 text-sm text-white hover:underline"
       >
         <span aria-hidden="true">&larr;</span>

@@ -11,8 +11,8 @@ import { useHoverFigTree } from "./HoverFigTreeContext";
 // panels can bleed off their column's outer edge at any window size/shape
 // (not just full-screen). Video layers use the real case-study demo
 // footage in place of the design's static screenshots.
-const PHILOSOPHICAL_VIDEO = "/fig-tree-demos/philosophical_video.MOV";
-const PRODUCT_DEMO_VIDEO = "/fig-tree-demos/product-demo-fig-tree_1.mp4";
+const PHILOSOPHICAL_VIDEO = "/fig-tree-demos/Create-Figment.mp4";
+const PRODUCT_DEMO_VIDEO = "/fig-tree-demos/Animated-Fig-Cover.mp4";
 
 const EDGE_MARGIN = "4vw"; // gap kept between content and the screen's left/right edges
 const VERTICAL_MARGIN = "10vw"; // set black margin kept above and below all content — safe as-is in full-screen
@@ -121,12 +121,6 @@ export function HoverFigTreeVisual() {
                 edge instead of cutting off flush against it. */}
             <div className="relative" style={{ marginTop: "0vw", paddingBottom: "1vw" }}>
               <div className="absolute" style={{ top: "-1vw", bottom: 0, left: `-${BLEED}`, right: "-6%", background: GREEN }} />
-              <p
-                className="font-karla relative mb-[1vw] uppercase text-white"
-                style={{ fontSize: "1.7vw", letterSpacing: "0.17vw", marginLeft: "-2vw" }}
-              >
-                PRODUCT DEMO
-              </p>
               <div
                 className="relative overflow-hidden rounded-[1.2vw]"
                 style={{ aspectRatio: "16 / 9", width: "88%", marginLeft: "-2vw" }}
@@ -228,12 +222,6 @@ export function HoverFigTreeVisual() {
                   data-name="philosophical-video"
                 />
               </div>
-              <p
-                className="font-karla relative mt-[1vw] text-right uppercase text-white"
-                style={{ fontSize: "1.7vw", letterSpacing: "0.17vw", width: "88%", marginLeft: "calc(12% + 2vw)" }}
-              >
-                PHILOSOPHICAL INSPIRATION
-              </p>
             </div>
           </div>
         </div>

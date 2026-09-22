@@ -22,6 +22,9 @@ import { HoverRadioVisual, HoverRadioClickCatcher } from "./HoverRadio";
 import { HoverPlaygroundVisual, HoverPlaygroundLinks, HoverPlaygroundClickCatcher } from "./HoverPlayground";
 import { PlaygroundVideoOverlay } from "./PlaygroundVideoOverlay";
 import { HomeBackground } from "./HomeBackground";
+import { ComingSoonCursor } from "./ComingSoonCursor";
+import { ReturnHomeZone } from "./ReturnHomeZone";
+import { ReadCaseStudyCursor } from "./ReadCaseStudyCursor";
 
 const SCENE_URL = "https://prod.spline.design/pFFQjNMbfHZm6XIf/scene.splinecode";
 
@@ -78,6 +81,20 @@ export default function FlowerScene() {
       <HoverAboutClickCatcher />
       <HoverRadioClickCatcher />
       <HoverPlaygroundClickCatcher />
+
+      {/* Below the click-catchers (z-5) — the "return home" dead-zone hit
+          target, only interactive where none of the above are. */}
+      <ReturnHomeZone rects={rects} containerRef={containerRef} />
+
+      {/* Same dead zone, but for the fig-tree overlay specifically —
+          claims it instead of ReturnHomeZone there (see both files'
+          comments). */}
+      <ReadCaseStudyCursor rects={rects} containerRef={containerRef} />
+
+      {/* Cursor-follow "coming soon" badge for the radio hover overlay —
+          pointer-events-none, so it never competes with the click-catchers
+          above for clicks. */}
+      <ComingSoonCursor containerRef={containerRef} rects={rects} />
 
       {/* Above the click-catchers (z-5) but below the nav-marker boxes
           (z-10) — the actual clickable @handle links in HoverPlayground's
