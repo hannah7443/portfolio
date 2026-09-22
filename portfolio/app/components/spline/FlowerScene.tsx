@@ -13,9 +13,17 @@ import { MARKER_ACCENT_COLOR } from "./labelFont";
 // component instead, loaded client-only via next/dynamic (Spline's WebGL
 // runtime can't run during SSR).
 const Spline = dynamic(() => import("@splinetool/react-spline"), { ssr: false });
+// TextureEffectBox pulls in `shadergradient` + `@paper-design/shaders-react`
+// — together the single largest JS chunk on this page (~1MB, bigger than
+// the Spline runtime itself), for what's purely decorative background
+// texture boxes. Loading it eagerly meant it competed with the Spline
+// scene's own fetch/boot for bandwidth and main-thread parse time on every
+// visit, even though nothing renders through it until `rects` has resolved
+// (which only happens after the scene has already loaded). Deferred via
+// next/dynamic so its chunk downloads separately, off the critical path.
+const TextureEffectBox = dynamic(() => import("./TextureEffectBox"), { ssr: false });
 import { useTrackedBoxes } from "./useTrackedBoxes";
 import NavPreviewBox from "./NavPreviewBox";
-import TextureEffectBox from "./TextureEffectBox";
 import { HoverFigTreeVisual, HoverFigTreeClickCatcher } from "./HoverFigTree";
 import { HoverAboutVisual, HoverAboutClickCatcher } from "./HoverAbout";
 import { HoverRadioVisual, HoverRadioClickCatcher } from "./HoverRadio";
