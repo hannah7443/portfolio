@@ -43,6 +43,16 @@ type HoverFigTreeContextValue = {
   playgroundOverlayTile: string | null;
   openPlaygroundOverlay: (name: string) => void;
   closePlaygroundOverlay: () => void;
+  /**
+   * Sticks true the first time the playground overlay is activated, and
+   * never resets. HoverPlaygroundVisual uses this to defer its video
+   * tiles' `src` until the first real hover instead of loading ~170MB of
+   * video the instant the homepage mounts — lives here (an event-handler
+   * setState, not an effect) rather than local state in that component,
+   * since a ref/effect-derived "has this ever been true" value runs afoul
+   * of this repo's stricter ref-during-render / setState-in-effect lint.
+   */
+  playgroundEverActivated: boolean;
 };
 
 const HoverFigTreeContext = createContext<HoverFigTreeContextValue | null>(null);
@@ -54,12 +64,14 @@ export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
   const [scrollOffset, setScrollOffset] = useState<Partial<Record<HoverOverlayId, number>>>({});
   const maxScrollRef = useRef<Partial<Record<HoverOverlayId, number>>>({});
   const [playgroundOverlayTile, setPlaygroundOverlayTile] = useState<string | null>(null);
+  const [playgroundEverActivated, setPlaygroundEverActivated] = useState(false);
 
   const activate = (id: HoverOverlayId) => {
     setActiveState(id);
     // Start each fresh activation scrolled to the top, rather than wherever
     // it was left the last time this overlay was shown.
     setScrollOffset((prev) => ({ ...prev, [id]: 0 }));
+    if (id === "playground") setPlaygroundEverActivated(true);
   };
 
   const setMaxScroll = (id: HoverOverlayId, max: number) => {
@@ -88,6 +100,7 @@ export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
         playgroundOverlayTile,
         openPlaygroundOverlay: setPlaygroundOverlayTile,
         closePlaygroundOverlay: () => setPlaygroundOverlayTile(null),
+        playgroundEverActivated,
       }}
     >
       {children}

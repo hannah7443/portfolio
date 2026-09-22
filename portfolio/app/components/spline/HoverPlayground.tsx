@@ -150,10 +150,20 @@ function MosaicHandles({ interactive }: { interactive: boolean }) {
  * clicks always fall through to whatever's above it.
  */
 export function HoverPlaygroundVisual() {
-  const { active, scrollOffset, setMaxScroll } = useHoverFigTree();
+  const { active, scrollOffset, setMaxScroll, playgroundEverActivated } = useHoverFigTree();
   const isActive = active === "playground";
   const outerRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+
+  // The 9 tiles below are 11-31MB each (~170MB total) — since this whole
+  // component stays permanently mounted (see the big comment on the
+  // rects.map call site in FlowerScene.tsx re: WebGL context churn), giving
+  // every tile's <video> a `src` unconditionally meant all 9 started
+  // downloading the instant the homepage loaded, whether or not anyone
+  // ever hovers "playground". `playgroundEverActivated` (set in
+  // HoverFigTreeContext's `activate`, sticks true forever once set) defers
+  // that until the first real hover instead.
+  const tilesLoaded = playgroundEverActivated;
 
   const EDGE_MARGIN = "4vw";
   const VERTICAL_MARGIN = "10vw";
@@ -230,7 +240,15 @@ export function HoverPlaygroundVisual() {
         >
           {VIDEO_TILES.map(({ name, src, box }) => (
             <div key={name} className="absolute overflow-hidden rounded-[1.5%] bg-black" style={boxStyle(box)}>
-              <video src={src} className="h-full w-full object-contain" autoPlay loop playsInline muted />
+              <video
+                src={tilesLoaded ? src : undefined}
+                preload="none"
+                className="h-full w-full object-contain"
+                autoPlay={tilesLoaded}
+                loop
+                playsInline
+                muted
+              />
             </div>
           ))}
 
@@ -267,7 +285,7 @@ export function HoverPlaygroundVisual() {
  * measurements, the same formula always yields the same result.
  */
 export function HoverPlaygroundLinks() {
-  const { active, scrollOffset, openPlaygroundOverlay } = useHoverFigTree();
+  const { active, scrollOffset } = useHoverFigTree();
   const isActive = active === "playground";
   const outerRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -299,16 +317,10 @@ export function HoverPlaygroundLinks() {
             visibility: isActive ? "visible" : "hidden",
           }}
         >
-          {VIDEO_TILES.map(({ name, box }) => (
-            <button
-              key={name}
-              type="button"
-              aria-label={`Open ${name.replace(/-/g, " ")}`}
-              className="pointer-events-auto absolute cursor-pointer"
-              style={boxStyle(box)}
-              onClick={() => openPlaygroundOverlay(name)}
-            />
-          ))}
+          {/* Artwork tiles are no longer clickable — was previously a hit
+              target per tile here opening PlaygroundVideoOverlay via
+              openPlaygroundOverlay(name); removed on request. The tiles
+              still autoplay/loop as decoration in HoverPlaygroundVisual. */}
 
           <TextBox box={MOSAIC_BOX} align="right" invisible>
             <p className="font-bold">WELCOME TO MY MOSAIC OF CREATIVITY</p>

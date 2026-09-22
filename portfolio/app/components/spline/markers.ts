@@ -70,6 +70,7 @@ export const MARKERS: Marker[] = [
     offsetY: 0,
     heightScale: 0.6,
     triggersHoverOverlay: "about",
+    disabled: true,
   },
   {
     kind: "nav",

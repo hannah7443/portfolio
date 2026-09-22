@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { LazyVideo } from "../../components/LazyVideo";
 
 // Figma "Main Tree" (node 2011:127): a dark case-study page with a
 // scroll-spy directory on the left whose fig icon slides down next to
 // whichever heading is currently active, and a hero cover video under
 // "Overview". Content for each section below the hero is filled in
 // separately.
+// COVER_VIDEO stays a plain eager <video> — it's the hero, visible the
+// instant the page loads, and small (~1.4MB). Every other demo clip below
+// is 25-244MB and sits further down the scroll, so those go through
+// LazyVideo instead — rendering all of them as normal autoplay <video>
+// tags meant every one of these started downloading simultaneously on
+// page load regardless of scroll position, which is what was making the
+// page (and whichever clip you actually scrolled to) feel stuck buffering.
 const COVER_VIDEO = "/fig-tree-demos/Animated-Fig-Cover.mp4";
 const ORCHARD_VIDEO = "/fig-tree-demos/Orchard-Demo.mp4";
 const CREATE_FIGMENT_VIDEO = "/fig-tree-demos/Create-Figment.mp4";
@@ -183,14 +191,7 @@ export default function FigTreePage() {
                 Jar</em>
               </p>
 
-              <video
-                src={PHILOSOPHICAL_VIDEO}
-                className="mt-6 w-full rounded-[2.5rem] object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+              <LazyVideo src={PHILOSOPHICAL_VIDEO} className="mt-6 w-full rounded-[2.5rem] object-cover" />
 
               <p className="font-red-hat-mono mt-6 w-full text-base leading-relaxed text-white/90">
                 As a young adult, Sylvia Plath&rsquo;s fig tree dilemma often emerges: when choosing a path &mdash; a
@@ -253,14 +254,7 @@ export default function FigTreePage() {
               <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#e3edb0]">Design Highlights</h2>
 
               <SubHeading>Orchard</SubHeading>
-              <video
-                src={ORCHARD_VIDEO}
-                className="mt-4 w-full rounded-[2.5rem] object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+              <LazyVideo src={ORCHARD_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
               <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Each user has an Orchard of Ideas with unlimited space to create new trees, where they can begin
                 growing figments. Trees can (and should!) range across all different topics: majors, art ideas,
@@ -268,14 +262,7 @@ export default function FigTreePage() {
               </p>
 
               <SubHeading>Seamlessly Begin Growing A Figment</SubHeading>
-              <video
-                src={CREATE_FIGMENT_VIDEO}
-                className="mt-4 w-full rounded-[2.5rem] object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+              <LazyVideo src={CREATE_FIGMENT_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
               <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Within each tree, users can easily begin growing new figments. Figments can be as detailed or
                 low-commitment as a user prefers: they can easily jot down notes or add pictures, and set the state
@@ -283,14 +270,7 @@ export default function FigTreePage() {
               </p>
 
               <SubHeading>Figment states + Tracker</SubHeading>
-              <video
-                src={FIGMENT_STATE_VIDEO}
-                className="mt-4 w-full rounded-[2.5rem] object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+              <LazyVideo src={FIGMENT_STATE_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
               <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 An unripe figment represents a newly formed idea. A ripening figment represents an idea in progress.
                 A ripe figment represents an idea ready for action. Users can simply click on a figment and change
@@ -299,14 +279,7 @@ export default function FigTreePage() {
               </p>
 
               <SubHeading>Grow a Sub-branch in an Existing Figment</SubHeading>
-              <video
-                src={SUB_BRANCH_VIDEO}
-                className="mt-4 w-full rounded-[2.5rem] object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+              <LazyVideo src={SUB_BRANCH_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
               <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Fig Tree accommodates big and small ideas. A figment that needs more organization can utilize the
                 sub-branch feature, which allows a user to grow another set of figments within an existing one.

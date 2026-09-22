@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useHoverFigTree } from "./HoverFigTreeContext";
 import { NameTitle, RepeatingWordLines } from "./HomeBackground";
 
@@ -176,23 +175,19 @@ export function HoverAboutVisual() {
  * Invisible full-screen hit target that only turns on while the overlay is
  * active. Mounted above the Spline canvas but below the nav-marker boxes
  * (z-index between the two) so a click on an actual nav box still goes to
- * that box's own Link, while a click anywhere else on the page navigates to
- * the about page.
+ * that box's own Link. /about isn't linkable from here anymore — a click
+ * just closes the overlay, same as radio/playground.
  */
 export function HoverAboutClickCatcher() {
   const { active, deactivate, addScroll } = useHoverFigTree();
   const isActive = active === "about";
-  const router = useRouter();
 
   return (
     <div
       className="absolute inset-0"
       style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none", cursor: isActive ? "pointer" : undefined }}
       aria-hidden={!isActive}
-      onClick={() => {
-        deactivate();
-        router.push("/about");
-      }}
+      onClick={() => deactivate()}
       onWheel={(e) => {
         if (isActive) addScroll("about", e.deltaY);
       }}
