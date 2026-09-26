@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Red+Hat+Mono:ital,wght@0,300..700;1,300..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -7,6 +8,7 @@
   --foreground: #171717;
   --font-red-hat-mono: "Red Hat Mono", monospace;
   --font-karla: "Karla", sans-serif;
+  --font-ibm-plex-mono: "IBM Plex Mono", monospace;
 }
 
 @theme inline {
@@ -16,6 +18,7 @@
   --font-mono: var(--font-geist-mono);
   --font-red-hat-mono: var(--font-red-hat-mono);
   --font-karla: var(--font-karla);
+  --font-ibm-plex-mono: var(--font-ibm-plex-mono);
 }
 
 body {

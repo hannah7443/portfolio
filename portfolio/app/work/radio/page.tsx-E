@@ -39,7 +39,7 @@ const INFO_COLUMNS = [
 
 function SubHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-ibm-plex-mono mt-10 text-xl font-normal uppercase tracking-wide text-[#3b6bd6]">{children}</h3>
+    <h3 className="font-red-hat-mono mt-10 text-xl font-normal uppercase tracking-wide">{children}</h3>
   );
 }
 
@@ -71,17 +71,17 @@ export default function RadioPage() {
   }, [activeId]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f1f2f3] text-[#0b1f4d]">
+    <div className="relative min-h-screen overflow-hidden bg-[#0b1530] text-white">
       <Link
         href="/"
-        className="font-ibm-plex-mono fixed left-8 top-8 z-30 flex items-center gap-2 text-sm text-[#12307a] hover:underline"
+        className="font-red-hat-mono fixed left-8 top-8 z-30 flex items-center gap-2 text-sm text-white hover:underline"
       >
         <span aria-hidden="true">&larr;</span>
         back to projects
       </Link>
 
       <div className="relative z-10 px-10 pb-32 pt-8 md:px-16">
-        <h1 className="font-sans text-4xl font-bold tracking-tight md:pl-64 md:text-6xl">
+        <h1 className="font-karla text-4xl font-bold uppercase tracking-widest md:pl-64 md:text-6xl">
           Building Radio&rsquo;s Future
         </h1>
 
@@ -95,7 +95,7 @@ export default function RadioPage() {
                 className="absolute -left-10 h-7 w-7 -translate-y-1 transition-[top] duration-300 ease-out"
                 style={{ top: iconTop }}
               />
-              <ul className="font-ibm-plex-mono flex flex-col gap-4 text-lg">
+              <ul className="font-red-hat-mono flex flex-col gap-4 text-lg">
                 {NAV_ITEMS.map((item) => (
                   <li key={item.id}>
                     <a
@@ -103,7 +103,7 @@ export default function RadioPage() {
                         itemRefs.current[item.id] = el;
                       }}
                       href={`#${item.id}`}
-                      className={activeId === item.id ? "font-bold text-[#12307a]" : "font-normal text-[#12307a]/60"}
+                      className={activeId === item.id ? "font-bold text-white" : "font-normal text-white/70"}
                     >
                       {item.label}
                     </a>
@@ -124,51 +124,51 @@ export default function RadioPage() {
                 playsInline
               />
 
-              <h2 className="font-ibm-plex-mono mt-8 text-3xl font-bold uppercase tracking-wide text-[#12307a]">Overview</h2>
+              <h2 className="font-red-hat-mono mt-8 text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Overview</h2>
 
               <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
                 {INFO_COLUMNS.map((col) => (
-                  <div key={col.label}>
-                    <p className="font-ibm-plex-mono text-xs font-bold uppercase tracking-widest text-[#3b6bd6]">{col.label}</p>
-                    <p className="font-sans tracking-wide mt-1 text-base text-[#8A8E90]">{col.value}</p>
+                  <div key={col.label} className="font-red-hat-mono">
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/60">{col.label}</p>
+                    <p className="mt-1 text-base text-white">{col.value}</p>
                   </div>
                 ))}
               </div>
 
               <SubHeading>Duke&rsquo;s Office of Information Technology Internship</SubHeading>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Building Radio&rsquo;s Future was project part of a 10-week, full-stack internship at Duke&rsquo;s Office of Information Technology (OIT) Department. Teams of Duke undergraduates were given real-world projects that address challenges at Duke, in Durham, and beyond, and built products from concept to completion.
               </p>
               <SubHeading>What is Non-Commercial Radio?</SubHeading>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Non-commercial radio stations are community-centered, volunteer-run radio stations. They focus on localized, human-curated music discovery in the age of mass-consumption and algorithmic media. These stations are crucial hubs to uplifting independent musicians and music scenes, promote local events and organizations, and build community centered on a shared love of music. WXDU and WXYC are two local non-commercial radio stations at and near Duke University.
               </p>
               <SubHeading>Stakeholders</SubHeading>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Our stakeholders for this project, Building Radio&rsquo;s Future, were software engineers at the following stations:
               </p>
-              <ol className="font-sans tracking-wide mt-4 w-full list-decimal space-y-2 pl-5 text-base leading-relaxed text-[#8A8E90]">
+              <ol className="font-red-hat-mono mt-4 w-full list-decimal space-y-2 pl-5 text-base leading-relaxed text-white/90">
                 <li>WXDU is Duke and Durham&rsquo;s alternative, non-commercial radio station. It is run by 50% undergraduate Duke students and 50% local community members.</li>
                 <li>WXYC is UNC Chapel Hill&rsquo;s student-run, freeform radio station. It is run primarily by undergraduates.</li>
               </ol>
             </section>
 
             <section id="problem" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Problem</h2>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Problem</h2>
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Radio software stacks are often custom-built by volunteers, fragile, and patchy, leading to a lack of maintainability/code accessibility and a hard-to-navigate streaming experience.
               </p>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Working with local non-commercial college radio stations WXDU (Duke and Durham&rsquo;s station) and WXYC (UNC Chapel Hill&rsquo;s station), our task was to create open-source, maintainable, and accessible solutions to the often scrappy, outdated technology that non-commercial radio stations rely on every day.
               </p>
             </section>
 
             <section id="ux-research" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">UX Research</h2>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">UX Research</h2>
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 We conducted 13 semi-structured interviews with DJs at WXDU to understand radio culture, technology, community, and issues to focus on. Conducting thematic analysis, we uncovered several common themes that informed our solutions:
               </p>
-              <ul className="font-sans tracking-wide mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-[#8A8E90]">
+              <ul className="font-red-hat-mono mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-white/90">
                 <li>Institutional instability: constant rotation of students in and out of station</li>
                 <li>Integral nature of music discovery to the station</li>
                 <li>DIY/Volunteer culture</li>
@@ -178,27 +178,27 @@ export default function RadioPage() {
             </section>
 
             <section id="challenges" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Challenges</h2>
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Challenges</h2>
               <SubHeading>Increase <span className="font-bold">visibility of current-playing</span> information &amp; ease of web-streaming WXDU</SubHeading>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 WXDU&rsquo;s website has not been updated since 2008, and UX interviews revealed that the location and function of streaming the radio on it was poor and difficult to navigate. The radio stream needed to be centralized in the new design.
               </p>
               <SubHeading>Overhaul visual style while keeping functionality familiar to users</SubHeading>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 WXDU&rsquo;s culture is shaped by an intergenerational connection between undergraduate students and community members &mdash; bridging the gap between Duke and Durham. It was extremely important to build a new design identity for the site that was accessible and easy to navigate for all users.
               </p>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 UX interviews revealed that WXDU&rsquo;s 2008 website was difficult to navigate.
               </p>
               <SubHeading>Improve real-time communication between DJs and listeners and encourage music exploration</SubHeading>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 The existing method of communication between listeners and DJs was for listeners to call the station number while a DJ was on air. This was outdated technology that DJs had to juggle with while queueing songs on air.
               </p>
             </section>
 
             <section id="solution-overview" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Solution Overview</h2>
-              <ol className="font-sans tracking-wide mt-4 w-full list-decimal space-y-2 pl-5 text-base leading-relaxed text-[#8A8E90]">
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Solution Overview</h2>
+              <ol className="font-red-hat-mono mt-4 w-full list-decimal space-y-2 pl-5 text-base leading-relaxed text-white/90">
                 <li>New Website for WXDU</li>
                 <li>WXDU Mobile Listening App</li>
                 <li>Vision Language Model for Album Alt Text</li>
@@ -206,22 +206,22 @@ export default function RadioPage() {
             </section>
 
             <section id="tech-stack" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Tech Stack</h2>
-              <p className="font-sans tracking-wide mt-6 text-base font-bold text-[#8A8E90]">Website:</p>
-              <ul className="font-sans tracking-wide mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-[#8A8E90]">
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Tech Stack</h2>
+              <p className="font-red-hat-mono mt-6 text-base font-bold text-white">Website:</p>
+              <ul className="font-red-hat-mono mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-white/90">
                 <li>Backend: Node.js, Express.js</li>
                 <li>Frontend: TailwindCSS, Next.js, TinaCMS</li>
                 <li>Database: MySQL, MongoDB</li>
                 <li>Other/Infra: Icecast</li>
               </ul>
-              <p className="font-sans tracking-wide mt-6 text-base font-bold text-[#8A8E90]">Mobile Development:</p>
-              <ul className="font-sans tracking-wide mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-6 text-base font-bold text-white">Mobile Development:</p>
+              <ul className="font-red-hat-mono mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-white/90">
                 <li>Backend: Express.js</li>
                 <li>Frontend: TypeScript, NativeWind, React Native, Expo</li>
                 <li>Database: MySQL, MongoDB</li>
               </ul>
-              <p className="font-sans tracking-wide mt-6 text-base font-bold text-[#8A8E90]">Vision Language Model:</p>
-              <ul className="font-sans tracking-wide mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-6 text-base font-bold text-white">Vision Language Model:</p>
+              <ul className="font-red-hat-mono mt-4 w-full list-disc space-y-2 pl-5 text-base leading-relaxed text-white/90">
                 <li>AI/ML Model: Qwen3-VL</li>
                 <li>AI/ML Runtime &amp; Inference: Ollama, mlx-vlm</li>
                 <li>Backend: Express.js</li>
@@ -231,46 +231,46 @@ export default function RadioPage() {
             </section>
 
             <section id="design-highlights" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Design Highlights</h2>
-              <p className="font-sans tracking-wide mt-6 text-xl font-bold text-[#8A8E90]">Website</p>
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Design Highlights</h2>
+              <p className="font-red-hat-mono mt-6 text-xl font-bold text-white">Website</p>
               <SubHeading>Customizable Bulletin Board Showcasing WXDU&rsquo;s Vibrant History</SubHeading>
               <LazyVideo src={BULLETIN_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 This customizable bulletin board of images is featured on the website&rsquo;s homepage, and showcases WXDU&rsquo;s past music show posters and station archives. Based on the UX interviews, it was imperative to highlight the rich history behind the station.
               </p>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 This feature is also customizable through the integration of TinaCMS: a headless, Git-backed content system. Users can log into the admin version of the website using this system and edit the pictures being shown without touching code. This enables non-technical users, such as DJs and community members, to edit the pictures to include upcoming show posters and event graphics on the bulletin board without navigating through a codebase.
               </p>
               <SubHeading>Vinyl Player Widget: View Song on Air</SubHeading>
               <LazyVideo src={VINYL_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Users on the homepage can easily see details about what song is on air and stream it. The widget updates dynamically as the DJ on air updates the song being played.
               </p>
               <SubHeading>Now Playing Widget: View DJ on Air</SubHeading>
               <LazyVideo src={NOW_PLAYING_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Featured on the homepage dashboard, viewers can immediately see more information about the who the DJ on air is and what the name of their show is via this widget.
               </p>
               <SubHeading>Custom WebGL Dynamic Background Shader</SubHeading>
               <LazyVideo src={DYNAMIC_BG_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Behind the homepage sits a slowly shifting background that gives the site the warm, analog feel of a live radio station. The background is a custom GLSL fragment shader rendered with WebGL, with every pixel calculated on the GPU rather than the CPU. It uses texture-based noise, caps rendering at 30fps and 1x pixel density, and requests the device&rsquo;s low-power GPU. These reduce battery drain and heat without a visible drop in quality.
               </p>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+              <p className="font-red-hat-mono mt-4 w-full text-base leading-relaxed text-white/90">
                 Before it loads, the site checks whether the device supports real hardware acceleration. If it doesn&rsquo;t, the site shows a static background instead of silently running the shader on the CPU and slowing the page down. Users with reduced-motion settings get the same static background, so the site stays accessible and consistent.
               </p>
             </section>
 
             <section id="user-testing" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">User Testing</h2>
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">User Testing</h2>
             </section>
 
             <section id="outcome" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Outcome</h2>
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Outcome</h2>
             </section>
 
             <section id="reflection" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Reflection</h2>
+              <h2 className="font-red-hat-mono text-3xl font-bold uppercase tracking-wide text-[#b7cdf5]">Reflection</h2>
             </section>
 
           </main>
