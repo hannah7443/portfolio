@@ -30,7 +30,6 @@ import { HoverRadioVisual, HoverRadioClickCatcher } from "./HoverRadio";
 import { HoverPlaygroundVisual, HoverPlaygroundLinks, HoverPlaygroundClickCatcher } from "./HoverPlayground";
 import { PlaygroundVideoOverlay } from "./PlaygroundVideoOverlay";
 import { HomeBackground } from "./HomeBackground";
-import { ComingSoonCursor } from "./ComingSoonCursor";
 import { ReturnHomeZone } from "./ReturnHomeZone";
 import { ReadCaseStudyCursor } from "./ReadCaseStudyCursor";
 
@@ -99,10 +98,16 @@ export default function FlowerScene() {
           comments). */}
       <ReadCaseStudyCursor rects={rects} containerRef={containerRef} />
 
-      {/* Cursor-follow "coming soon" badge for the radio hover overlay —
-          pointer-events-none, so it never competes with the click-catchers
-          above for clicks. */}
-      <ComingSoonCursor containerRef={containerRef} rects={rects} />
+      {/* Same cursor badge/click behavior for the radio overlay, linking to
+          its case study. */}
+      <ReadCaseStudyCursor
+        rects={rects}
+        containerRef={containerRef}
+        overlayId="radio"
+        href="/work/radio"
+        label="View the full case study"
+        badgeClassName="bg-[#130754]"
+      />
 
       {/* Above the click-catchers (z-5) but below the nav-marker boxes
           (z-10) — the actual clickable @handle links in HoverPlayground's

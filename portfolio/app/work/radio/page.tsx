@@ -81,7 +81,7 @@ export default function RadioPage() {
       </Link>
 
       <div className="relative z-10 px-10 pb-32 pt-8 md:px-16">
-        <h1 className="font-sans text-4xl font-bold tracking-tight md:pl-64 md:text-6xl">
+        <h1 className="font-ibm-plex-mono text-lg font-bold uppercase tracking-[0.25em] md:pl-64 md:text-xl">
           Building Radio&rsquo;s Future
         </h1>
 
@@ -233,14 +233,6 @@ export default function RadioPage() {
             <section id="design-highlights" className="scroll-mt-28 pt-24">
               <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#12307a]">Design Highlights</h2>
               <p className="font-sans tracking-wide mt-6 text-xl font-bold text-[#8A8E90]">Website</p>
-              <SubHeading>Customizable Bulletin Board Showcasing WXDU&rsquo;s Vibrant History</SubHeading>
-              <LazyVideo src={BULLETIN_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
-                This customizable bulletin board of images is featured on the website&rsquo;s homepage, and showcases WXDU&rsquo;s past music show posters and station archives. Based on the UX interviews, it was imperative to highlight the rich history behind the station.
-              </p>
-              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
-                This feature is also customizable through the integration of TinaCMS: a headless, Git-backed content system. Users can log into the admin version of the website using this system and edit the pictures being shown without touching code. This enables non-technical users, such as DJs and community members, to edit the pictures to include upcoming show posters and event graphics on the bulletin board without navigating through a codebase.
-              </p>
               <SubHeading>Vinyl Player Widget: View Song on Air</SubHeading>
               <LazyVideo src={VINYL_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
               <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
@@ -258,6 +250,14 @@ export default function RadioPage() {
               </p>
               <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
                 Before it loads, the site checks whether the device supports real hardware acceleration. If it doesn&rsquo;t, the site shows a static background instead of silently running the shader on the CPU and slowing the page down. Users with reduced-motion settings get the same static background, so the site stays accessible and consistent.
+              </p>
+              <SubHeading>Customizable Bulletin Board Showcasing WXDU&rsquo;s Vibrant History</SubHeading>
+              <LazyVideo src={BULLETIN_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
+              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+                This customizable bulletin board of images is featured on the website&rsquo;s homepage, and showcases WXDU&rsquo;s past music show posters and station archives. Based on the UX interviews, it was imperative to highlight the rich history behind the station.
+              </p>
+              <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
+                This feature is also customizable through the integration of TinaCMS: a headless, Git-backed content system. Users can log into the admin version of the website using this system and edit the pictures being shown without touching code. This enables non-technical users, such as DJs and community members, to edit the pictures to include upcoming show posters and event graphics on the bulletin board without navigating through a codebase.
               </p>
             </section>
 

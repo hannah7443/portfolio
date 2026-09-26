@@ -18,16 +18,24 @@ const OFFSET_Y = 16;
  * overlap — same pattern as ComingSoonCursor on the radio page. Same
  * dot→pill reveal style as ComingSoonCursor, just a wider final width for
  * this longer label (see `case-study-reveal` in globals.css). Clicking
- * navigates to /work/fig-tree, matching HoverFigTreeClickCatcher's own
+ * navigates to `href` (default /work/fig-tree), matching HoverFigTreeClickCatcher's own
  * full-screen click behavior (this is a visual cursor cue for that same
  * click target, not a new one).
  */
 export function ReadCaseStudyCursor({
   rects,
   containerRef,
+  overlayId = "fig-tree",
+  href = "/work/fig-tree",
+  label = "Read full case study",
+  badgeClassName = "bg-[#2d2f20]",
 }: {
   rects: TrackedRect[];
   containerRef: React.RefObject<HTMLDivElement | null>;
+  overlayId?: "fig-tree" | "radio";
+  href?: string;
+  label?: string;
+  badgeClassName?: string;
 }) {
   const { active, deactivate } = useHoverFigTree();
   const router = useRouter();
@@ -40,7 +48,7 @@ export function ReadCaseStudyCursor({
     rectsRef.current = rects;
   }, [rects]);
 
-  const isActive = active === "fig-tree";
+  const isActive = active === overlayId;
 
   useEffect(() => {
     // No need to reset `inZone` when `isActive` goes false — `showing`
@@ -85,7 +93,7 @@ export function ReadCaseStudyCursor({
       {showing && (
         <div
           ref={badgeRef}
-          className="pointer-events-none fixed z-20 flex items-center justify-center overflow-hidden rounded-full bg-[#2d2f20]"
+          className={`pointer-events-none fixed z-20 flex items-center justify-center overflow-hidden rounded-full ${badgeClassName}`}
           style={{
             height: 54,
             animation: "case-study-reveal 0.6s ease-out forwards",
@@ -95,7 +103,7 @@ export function ReadCaseStudyCursor({
             className="whitespace-nowrap text-center font-bold uppercase text-white"
             style={{ fontFamily: '"Red Hat Mono", monospace', fontSize: 14, letterSpacing: "-0.01em" }}
           >
-            Read full case study
+            {label}
           </p>
         </div>
       )}
@@ -109,7 +117,7 @@ export function ReadCaseStudyCursor({
         onClick={() => {
           if (!showing) return;
           deactivate();
-          router.push("/work/fig-tree");
+          router.push(href);
         }}
       />
     </>

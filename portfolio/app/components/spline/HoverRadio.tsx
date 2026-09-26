@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useHoverFigTree } from "./HoverFigTreeContext";
 
 // Figma "Frame17" (node 463:1519), re-laid-out the same way HoverFigTree.tsx
@@ -11,7 +12,8 @@ import { useHoverFigTree } from "./HoverFigTreeContext";
 // the same real WXDU website-demo footage (the mobile-listening layer's
 // video is a placeholder for now, per the design brief, until a real mobile
 // demo clip exists).
-const WXDU_WEBSITE_DEMO_VIDEO = "/radio-demos/WXDU-Website-Demo.mov";
+const RADIO_COVER_VIDEO = "/radio-demos/Radio-Cover.mp4";
+const VINYL_DEMO_VIDEO = "/radio-demos/Vinyl-Demo.mp4";
 const CD_ICON_SOURCE = "/radio-demos/icons/cd-icon-source.png";
 const RADIO_HEADER_UNION = "/radio-demos/icons/radio-header-union.svg";
 // "Static Rectangle"'s actual source texture (node 463:1534's rawImages,
@@ -49,6 +51,8 @@ type CardLayout = {
   cd: Box;
   /** The header title's baseline position. */
   title: Box;
+  /** Extra downward nudge for the title only (frame units). */
+  titleDy?: number;
 } & (
   | { headerKind: "union"; union: Box }
   | { headerKind: "split"; bar: Box; triLeft: Box; triRight: Box }
@@ -83,12 +87,13 @@ const MOBILE_LAYOUT: CardLayout = {
   shadow: { x: 6.75, y: 53, w: 539, h: 346 },
   shadowImage: "/radio-demos/icons/mobile-shadow-card.png",
   noise: { x: 22.75, y: 67, w: 508, h: 224 },
-  cd: { x: 169.016, y: 3.543, w: 49.022, h: 46.853 },
-  title: { x: 227, y: 14, w: 300, h: 40 },
+  cd: { x: 119.016, y: 3.543, w: 49.022, h: 46.853 },
+  title: { x: 177, y: 14, w: 300, h: 40 },
+  titleDy: 5,
   headerKind: "split",
   // h extended down from the design's own 51 (top edge unchanged).
-  bar: { x: 163, y: 2, w: 339, h: 75 },
-  triLeft: { x: 118, y: 0, w: 89.894, h: 71.892 },
+  bar: { x: 113, y: 2, w: 389, h: 75 },
+  triLeft: { x: 68, y: 0, w: 89.894, h: 71.892 },
   // Scaled down ~15% from the design's own 95.756x76, anchored to the
   // same bottom-right corner (x+w and y+h both still land on 547.756/76)
   // so it shrinks in place instead of drifting.
@@ -195,7 +200,7 @@ function MediaCard({ layout, title, video }: { layout: CardLayout; title: string
         className="font-karla absolute whitespace-nowrap uppercase text-white"
         style={{
           left: pct(layout.title.x, frame.w),
-          top: pct(layout.cd.y + layout.cd.h / 2, frame.h),
+          top: pct(layout.cd.y + layout.cd.h / 2 + (layout.titleDy ?? 0), frame.h),
           transform: "translateY(-50%)",
           fontSize: "1.4vw",
           letterSpacing: "0.18vw",
@@ -279,12 +284,8 @@ function VinylCluster() {
 }
 
 /**
- * The full WXDU case-study layout — built, but not wired up as the live
- * "radio" hover overlay yet (see HoverRadioVisual below, which shows a
- * "coming soon" cursor badge instead until /work/radio is ready to link to
- * for real). Parked here rather than deleted: unused for now, but kept
- * exported so it isn't dead code and can be dropped back in wholesale once
- * the case study is ready to ship.
+ * The full WXDU case-study layout, used as the live "radio" hover overlay
+ * (see HoverRadioVisual below).
  */
 export function RadioCaseStudyContent() {
   const { active, scrollOffset, setMaxScroll } = useHoverFigTree();
@@ -365,6 +366,7 @@ export function RadioCaseStudyContent() {
           fontSize: titleRect?.fontSize ?? "3.2vw",
           letterSpacing: "0.32vw",
           lineHeight: 1.1,
+          transform: "translateY(-2vw)",
           opacity: titleRect ? 1 : 0,
         }}
       >
@@ -395,7 +397,7 @@ export function RadioCaseStudyContent() {
               <div className="relative" style={{ paddingBottom: "5vw", marginTop: "1.2vw" }}>
                 <div className="absolute" style={{ top: "-1vw", bottom: "1vw", left: `-${BLEED}`, right: "-6%", background: BLUE }} />
                 <div className="relative" style={{ width: "88%", marginLeft: "-2vw" }}>
-                  <MediaCard layout={RADIO_LAYOUT} title="RADIO WEBSITE REDESIGN" video={WXDU_WEBSITE_DEMO_VIDEO} />
+                  <MediaCard layout={RADIO_LAYOUT} title="RADIO WEBSITE REDESIGN" video={RADIO_COVER_VIDEO} />
                 </div>
               </div>
 
@@ -465,7 +467,7 @@ export function RadioCaseStudyContent() {
               <div className="relative" style={{ paddingBottom: "9vw", marginTop: "0vw" }}>
                 <div className="absolute" style={{ inset: 0, left: "-6%", right: `-${BLEED}`, background: BLUE }} />
                 <div className="relative" style={{ width: "88%", marginLeft: "calc(12% + 2vw)", marginTop: "1.5vw" }}>
-                  <MediaCard layout={MOBILE_LAYOUT} title="MOBILE LISTENING APP" video={WXDU_WEBSITE_DEMO_VIDEO} />
+                  <MediaCard layout={MOBILE_LAYOUT} title="STREAMING EXPERIENCES" video={VINYL_DEMO_VIDEO} />
                 </div>
               </div>
             </div>
@@ -477,43 +479,37 @@ export function RadioCaseStudyContent() {
 }
 
 /**
- * The live "radio" hover overlay — just a black backdrop (matching the
- * other overlays' full-bleed treatment) while the case study itself isn't
- * ready to show. The actual "coming soon" messaging is the cursor-follow
- * badge rendered by ComingSoonCursor, mounted separately in FlowerScene.tsx
- * so it can track the pointer independently of this backdrop's fade.
+ * The live "radio" hover overlay: the full case-study layout above.
  */
 export function HoverRadioVisual() {
-  const { active } = useHoverFigTree();
-  const isActive = active === "radio";
-
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 z-0 bg-black transition-opacity duration-300"
-      style={{ opacity: isActive ? 1 : 0 }}
-      aria-hidden={!isActive}
-      data-name="hover-radio"
-    />
-  );
+  return <RadioCaseStudyContent />;
 }
 
 /**
  * Invisible full-screen hit target that only turns on while the overlay is
  * active. Mounted above the Spline canvas but below the nav-marker boxes
  * (z-index between the two) so a click on an actual nav box still goes to
- * that box's own Link. The case study isn't linkable yet, so a click here
- * just closes the overlay instead of navigating anywhere.
+ * that box's own Link, while a click anywhere else navigates to the radio
+ * case study — same as HoverFigTreeClickCatcher. Also forwards wheel input
+ * to the overlay's shared scroll offset.
  */
 export function HoverRadioClickCatcher() {
-  const { active, deactivate } = useHoverFigTree();
+  const { active, deactivate, addScroll } = useHoverFigTree();
   const isActive = active === "radio";
+  const router = useRouter();
 
   return (
     <div
       className="absolute inset-0"
-      style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none" }}
+      style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none", cursor: isActive ? "pointer" : undefined }}
       aria-hidden={!isActive}
-      onClick={() => deactivate()}
+      onClick={() => {
+        deactivate();
+        router.push("/work/radio");
+      }}
+      onWheel={(e) => {
+        if (isActive) addScroll("radio", e.deltaY);
+      }}
     />
   );
 }

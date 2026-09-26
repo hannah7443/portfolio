@@ -80,7 +80,7 @@ export default function FigTreePage() {
   }, [activeId]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f5f2ec] text-[#1f3d12]">
+    <div className="relative min-h-screen overflow-hidden bg-[#f1f2f3] text-[#1f3d12]">
       {/* Decorative blurred branches. The directory sidebar's wrapper now
           stretches to the full content height so its sticky child stays
           pinned near the top of the viewport for the entire scroll range,
@@ -109,7 +109,7 @@ export default function FigTreePage() {
       </Link>
 
       <div className="relative z-10 px-10 pb-32 pt-8 md:px-16">
-        <h1 className="font-sans text-4xl font-bold tracking-tight md:pl-64 md:text-6xl">
+        <h1 className="font-ibm-plex-mono text-lg font-bold uppercase tracking-[0.25em] md:pl-64 md:text-xl">
           Fig Tree Notes App
         </h1>
 
