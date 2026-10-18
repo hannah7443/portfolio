@@ -29,7 +29,6 @@ import { HoverAboutVisual, HoverAboutClickCatcher } from "./HoverAbout";
 import { HoverRadioVisual, HoverRadioClickCatcher } from "./HoverRadio";
 import { HoverPlaygroundVisual, HoverPlaygroundLinks, HoverPlaygroundClickCatcher } from "./HoverPlayground";
 import { PlaygroundVideoOverlay } from "./PlaygroundVideoOverlay";
-import { HomeBackground } from "./HomeBackground";
 import { ReturnHomeZone } from "./ReturnHomeZone";
 import { ReadCaseStudyCursor } from "./ReadCaseStudyCursor";
 
@@ -48,11 +47,7 @@ export default function FlowerScene() {
   return (
     <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
       {/* Behind the flower: no z-index, mounted before <Spline> in the DOM
-          so normal paint order puts Spline's canvas on top of it.
-          HomeBackground goes first (furthest back) since it's always
-          visible — HoverFigTreeVisual/HoverRadioVisual paint over it with
-          their own opaque bg-black whenever a hover overlay is active. */}
-      <HomeBackground />
+          so normal paint order puts Spline's canvas on top of it. */}
       <HoverFigTreeVisual />
       <HoverAboutVisual />
       <HoverRadioVisual />
