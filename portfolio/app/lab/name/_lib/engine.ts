@@ -1,6 +1,6 @@
 import { STYLES, styleFor } from "./renderers";
 import { LOOP_SECONDS, phaseAt, planLoop, slotAt, type LoopPlan, type PhaseName } from "./timeline";
-import type { Letter, Rect, RenderInfo, Slot, StyleDef, StyleParams } from "./types";
+import type { Letter, Rect, RenderInfo, Slot, StyleParams } from "./types";
 
 // Owns the clock, the timeline lookup and drawing. React only mounts the
 // canvas and drives tick()/draw() from one requestAnimationFrame loop.
@@ -8,7 +8,7 @@ import type { Letter, Rect, RenderInfo, Slot, StyleDef, StyleParams } from "./ty
 // while running, so pausing or hiding the tab never makes the loop jump.
 
 /** Palette, from the Figma: white ink on black, plus its two greys (the ASCII blocks). */
-export const PALETTE = { paper: "#000000", ink: "255, 255, 255", light: "#d9d9d9", dark: "#888888", field: "#555555" };
+export const PALETTE = { paper: "#000000", ink: "255, 255, 255", light: "#d9d9d9", dark: "#888888" };
 
 /** Figma px per base cell — the grid most of the Figma letters are drawn on. */
 const FIGMA_CELL = 16;
@@ -19,6 +19,20 @@ const STILL_FLICKER_SCALE = 0.5;
 const LINE_GAP = 2 * FIGMA_CELL;
 
 type Layout = { boxes: Rect[]; origin: { x: number; y: number }; cell: number };
+
+/** How the name is fitted into its canvas. */
+export type Fit = {
+  /** "auto": one line, stacking "shin" under "hannah" on portrait canvases. "one": always one line. */
+  lines: "auto" | "one";
+  /** Share of the canvas width / height the name may fill. */
+  fillW: number;
+  fillH: number;
+};
+
+/** The /lab/name page: centered with breathing room, stacking on portrait screens. */
+export const LAB_FIT: Fit = { lines: "auto", fillW: 0.9, fillH: 0.62 };
+/** A full-width strip (the homepage): one line, filling its container, which takes the name's own aspect ratio (nameAspect). */
+export const STRIP_FIT: Fit = { lines: "one", fillW: 1, fillH: 1 };
 
 /** A letter's padded mask extent in Figma px. */
 function extent(letter: Letter) {
@@ -36,18 +50,25 @@ function lineExtent(line: Letter[]) {
   };
 }
 
+/** Width ÷ height of the name laid out on one line (padded masks included) — the shape a full-width strip should take. */
+export function nameAspect(words: Letter[][]): number {
+  const e = lineExtent(words.flat());
+  return (e.right - e.left) / (e.bottom - e.top);
+}
+
 /**
  * Places every letter where the Figma composition puts it, scaled so one
  * Figma base cell (16px) becomes a whole number of device pixels. Lays the
- * name out on one line, as in the Figma, except on portrait screens, where
- * "shin" stacks under "hannah" so the letters don't shrink to nothing.
+ * name out on one line, as in the Figma — except, with `fit.lines` "auto",
+ * on portrait canvases, where "shin" stacks under "hannah" so the letters
+ * don't shrink to nothing.
  */
-function layout(words: Letter[][], width: number, height: number): Layout {
-  const lines = width >= height ? [words.flat()] : words;
+function layout(words: Letter[][], width: number, height: number, fit: Fit): Layout {
+  const lines = fit.lines === "one" || width >= height ? [words.flat()] : words;
   const exts = lines.map(lineExtent);
   const fitW = Math.max(...exts.map((e) => e.right - e.left));
   const fitH = exts.reduce((n, e) => n + e.bottom - e.top, 0) + LINE_GAP * (lines.length - 1);
-  const cell = Math.max(2, Math.floor(Math.min((width * 0.9) / (fitW / FIGMA_CELL), (height * 0.62) / (fitH / FIGMA_CELL))));
+  const cell = Math.max(2, Math.floor(Math.min((width * fit.fillW) / (fitW / FIGMA_CELL), (height * fit.fillH) / (fitH / FIGMA_CELL))));
 
   const toPx = (figmaPx: number) => Math.round((figmaPx / FIGMA_CELL) * cell);
   const totalH = exts.reduce((n, e) => n + toPx(e.bottom - e.top), 0) + toPx(LINE_GAP) * (lines.length - 1);
@@ -97,9 +118,12 @@ export class NameEngine {
   private layout: Layout | null = null;
   private size = { width: 0, height: 0 };
 
-  constructor(words: Letter[][]) {
+  private readonly fit: Fit;
+
+  constructor(words: Letter[][], fit: Fit = LAB_FIT) {
     this.words = words;
     this.letters = words.flat();
+    this.fit = fit;
   }
 
   get loopIndex() {
@@ -178,7 +202,7 @@ export class NameEngine {
   resize(width: number, height: number, dpr: number) {
     this.size = { width, height };
     this.params.dpr = dpr;
-    this.layout = layout(this.words, width, height);
+    this.layout = layout(this.words, width, height, this.fit);
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -197,22 +221,11 @@ export class NameEngine {
       return { letter, box: lay.boxes[i], slot, style, info: { since, index: i, unified: false } as RenderInfo };
     });
 
-    // Unified: every letter shares one style. Then that style's
-    // whole-canvas backdrop (if any) replaces the per-letter backgrounds.
+    // Unified: every letter shares one style.
     const unified = this.forced !== null || (this.phase === "unified" && states.every((s) => s.slot === states[0].slot));
-    let backdropDrawn: StyleDef | null = null;
-    if (unified && states[0]?.style?.def.backdrop) {
-      backdropDrawn = states[0].style.def;
-      backdropDrawn.backdrop!(ctx, { width, height, cell: lay.cell }, this.time, this.params);
-    }
 
-    // Pass 1: box backgrounds, all before any letter, so none covers a neighbor's cells.
     for (const s of states) {
       s.info.unified = unified;
-      if (s.style && s.style.def !== backdropDrawn) s.style.def.background?.(ctx, s.letter, s.box, this.time, this.params, s.info);
-    }
-    // Pass 2: the letters.
-    for (const s of states) {
       // Rest is the moving solid (Solid's breathing).
       if (s.slot === "rest") STYLES.solid.draw(ctx, s.letter, s.box, this.time, this.params, s.info);
       // Still: the same solid with its breathing held where the still began and only a faint flicker left.

@@ -31,6 +31,7 @@ import { HoverPlaygroundVisual, HoverPlaygroundLinks, HoverPlaygroundClickCatche
 import { PlaygroundVideoOverlay } from "./PlaygroundVideoOverlay";
 import { ReturnHomeZone } from "./ReturnHomeZone";
 import { ReadCaseStudyCursor } from "./ReadCaseStudyCursor";
+import NameCanvasClient from "../../lab/name/NameCanvasClient";
 
 const SCENE_URL = "https://prod.spline.design/pFFQjNMbfHZm6XIf/scene.splinecode";
 
@@ -48,6 +49,16 @@ export default function FlowerScene() {
     <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
       {/* Behind the flower: no z-index, mounted before <Spline> in the DOM
           so normal paint order puts Spline's canvas on top of it. */}
+
+      {/* The "hannah shin" mixed-media letters (app/lab/name), full width
+          along the bottom of the screen. First in paint order, so the flower
+          draws over it and a hover overlay's opaque bg-black covers it like
+          the rest of the background; pointer-events off so it never
+          intercepts clicks meant for the scene. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0">
+        <NameCanvasClient variant="strip" />
+      </div>
+
       <HoverFigTreeVisual />
       <HoverAboutVisual />
       <HoverRadioVisual />

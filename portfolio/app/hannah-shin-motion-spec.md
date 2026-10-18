@@ -94,7 +94,7 @@ The **rest** state is every letter as a plain solid mask with no motion. It's th
 
 ### 3.4 ASCII (ref video 4)
 
-> **Changed:** the resolution steps (grid stepping coarser over time) were removed — ASCII cells keep one size throughout, in both the individual and unified phases. Treatments follow the Figma's grey blocks rather than pink/green.
+> **Changed:** the resolution steps (grid stepping coarser over time) were removed — ASCII cells keep one size throughout, in both the individual and unified phases. The "=" background field was removed too: the letter sits straight on the page background. Treatments follow the Figma's grey blocks rather than pink/green.
 
 **What's happening:** the whole background is a field of dim "=" characters in a monospace grid on black. Inside the letters, cells hold random characters (A–Z, a–z, `@ ^ \ > ? [ \``) that keep re-rolling. Some cells are inverted blocks: black on white, black on pink, or white on green. Some "=" also appear inside the letters. Over about 9s, the grid resolution steps coarser in discrete jumps, so the letters go from crisp to barely legible.
 
@@ -107,6 +107,8 @@ The **rest** state is every letter as a plain solid mask with no motion. It's th
 - Font: any monospace stack (e.g. `"JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace`).
 
 ### 3.5 Outline gallop (ref video 5)
+
+> **Changed:** no graph-paper grid behind the letters (individual or unified) — just the white outline on the page background. In the unified phase every letter moves too, with a gentler band-shift instead of the full gallop.
 
 **What's happening:** a single indigo outline traces the stair-stepped boundary of a pixel shape on graph paper. The shape loops through 6–8 distinct poses of a gallop (Muybridge-style) at about 0.31s per pose. It's choppy and stepped, with no in-betweens. The outline always follows the grid lines.
 

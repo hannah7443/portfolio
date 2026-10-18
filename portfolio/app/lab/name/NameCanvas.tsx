@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { NameEngine } from "./_lib/engine";
+import { LAB_FIT, NameEngine, STRIP_FIT, nameAspect } from "./_lib/engine";
 import { buildWords } from "./_lib/letters";
 import type { Slot } from "./_lib/types";
 import DebugPanel from "./DebugPanel";
@@ -10,17 +10,26 @@ import DebugPanel from "./DebugPanel";
 // pauses whenever the canvas is offscreen or the tab is hidden. With
 // prefers-reduced-motion there is no loop at all: the rest state shows,
 // and each click steps to the next style as a still (spec §5).
+//
+// Two variants: "lab" fills its parent (the /lab/name page, with the dev
+// debug panel); "strip" is a full-width band whose height follows the
+// name's own aspect ratio (the homepage, under the flower).
 
 const REDUCED_MOTION_STILLS: Slot[] = ["rest", "solid", "dots", "crossStitch", "ascii", "outline", "morph"];
 /** A fixed moment to sample still frames at, so reduced-motion stills are the same every visit. */
 const STILL_TIME = 2;
 
-export default function NameCanvas() {
+export type NameCanvasVariant = "lab" | "strip";
+
+export default function NameCanvas({ variant = "lab" }: { variant?: NameCanvasVariant }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // Safe to touch the DOM here: this component is only ever loaded with
   // ssr: false (see NameCanvasClient), and masks are rasterized via canvas.
-  const [engine] = useState(() => new NameEngine(buildWords()));
+  const [{ engine, aspect }] = useState(() => {
+    const words = buildWords();
+    return { engine: new NameEngine(words, variant === "strip" ? STRIP_FIT : LAB_FIT), aspect: nameAspect(words) };
+  });
   const [reducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   useEffect(() => {
@@ -92,7 +101,11 @@ export default function NameCanvas() {
   }, [engine, reducedMotion]);
 
   return (
-    <div ref={wrapRef} className="relative h-full w-full">
+    <div
+      ref={wrapRef}
+      className={variant === "strip" ? "relative w-full" : "relative h-full w-full"}
+      style={variant === "strip" ? { aspectRatio: aspect } : undefined}
+    >
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full"
@@ -100,7 +113,7 @@ export default function NameCanvas() {
         role="img"
         aria-label="hannah shin"
       />
-      {process.env.NODE_ENV === "development" && <DebugPanel engine={engine} />}
+      {variant === "lab" && process.env.NODE_ENV === "development" && <DebugPanel engine={engine} />}
     </div>
   );
 }

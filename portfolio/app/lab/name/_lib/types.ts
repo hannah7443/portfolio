@@ -42,8 +42,6 @@ export type StyleParams = {
   /** The Figma's two greys (its ASCII blocks): light #d9d9d9, dark #888. */
   light: string;
   dark: string;
-  /** The ASCII "=" field. */
-  field: string;
   dpr: number;
   /**
    * Solid only, set during the still beat: freeze the breathing at `breathAt`
@@ -71,13 +69,6 @@ export type Renderer = (
   info: RenderInfo,
 ) => void;
 
-/** Whole-canvas layer drawn once under every letter when all of them share a style (e.g. ASCII's "=" field). */
-export type Backdrop = (ctx: CanvasRenderingContext2D, size: { width: number; height: number; cell: number }, t: number, p: StyleParams) => void;
-
 export type StyleDef = {
   draw: Renderer;
-  /** Drawn for every letter before any letter's `draw`, so a letter's box background never covers a neighbor. */
-  background?: Renderer;
-  /** Replaces the per-letter backgrounds while all letters share this style. */
-  backdrop?: Backdrop;
 };
