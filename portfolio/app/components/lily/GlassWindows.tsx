@@ -3,7 +3,7 @@
 import { LiquidGlass } from "apple-liquid-glass-webgl";
 import Link from "next/link";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
-import { useHoverFigTree } from "../../components/spline/HoverFigTreeContext";
+import { useHoverFigTree } from "../spline/HoverFigTreeContext";
 import {
   DEFAULT_FROST,
   FIGMA_ANTHERS,
@@ -12,7 +12,7 @@ import {
   NAV_WINDOWS,
   type LabelCorner,
   type NavWindow,
-} from "./_lib/navWindows";
+} from "./navWindows";
 
 // The glass nav windows over the flower, rebuilt with apple-liquid-glass-webgl
 // (Figma's native Glass effect has no CSS export). One LiquidGlass instance on
@@ -171,8 +171,8 @@ function GlassWindow({
   const chip = <Chip label={w.label} corner={w.labelAt ?? "top-left"} />;
   if (w.overlay) {
     const overlay = w.overlay;
-    // No page yet: opens the homepage's full-screen hover overlay, on hover like the
-    // homepage marker, and on focus/click so it works from the keyboard and on touch.
+    // Opens one of the full-screen hover screens instead of navigating: on hover like the
+    // old homepage markers, and on focus/click so it works from the keyboard and on touch.
     return (
       <button
         ref={elementRef}
@@ -180,7 +180,7 @@ function GlassWindow({
         type="button"
         className={`${WINDOW} ${FOCUS} pointer-events-auto cursor-pointer bg-transparent p-0`}
         style={style}
-        aria-label={`${w.label} — show playground`}
+        aria-label={`${w.label} — show ${w.label.toLowerCase()} screen`}
         onMouseEnter={() => activate(overlay)}
         onFocus={() => activate(overlay)}
         onClick={() => activate(overlay)}
@@ -207,10 +207,11 @@ function Chip({ label, corner }: { label: ReactNode; corner: LabelCorner }) {
     <span
       className={`absolute ${CHIP_CORNER[corner]} whitespace-nowrap bg-white text-center uppercase text-[#6d6d6d]`}
       style={{
-        // Figma: ABC Favorit Mono Medium 16px, tracking -0.64px, 4px side padding. IBM Plex Mono
-        // Medium stands in until Favorit is licensed for the project.
+        // Figma: ABC Favorit Mono Medium 16px, tracking -0.64px, 4px side padding. Favorit is
+        // only present locally (a trial font that can't be deployed — see globals.css), so
+        // the live site falls back to IBM Plex Mono.
         fontFamily:
-          'var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace, monospace',
+          '"ABC Favorit Mono", var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace, monospace',
         fontWeight: 500,
         fontSize: "calc(16px * var(--s))",
         letterSpacing: "-0.04em",

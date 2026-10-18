@@ -71,7 +71,73 @@ function partOf(mesh: THREE.Object3D): Part | null {
  * component instead), hides the marker placeholders (they stay in the scene
  * for screen tracking) and assigns materials and shadows.
  */
+/**
+ * Leaf edits on top of the exported model, by their names in the Spline/GLB
+ * scene. At the homepage camera: "leaf-static-1" is the upper-left leaf,
+ * "leaf-static-2" the middle one (on the right), "leaf-static-3" the bottom
+ * one (on the left).
+ */
+const REMOVED_LEAVES = ["leaf-static-2"];
+/**
+ * Mirrored left-to-right across the stem, so they stay attached to it but
+ * grow out the other side.
+ */
+const MIRRORED_LEAVES = ["leaf-static-3"];
+/** Moves leaves up (+) or down (−) the stem, in scene units (about a screen pixel each at the homepage size). */
+const RAISED_LEAVES: Record<string, number> = { "leaf-static-3": 40 };
+/** Resizes leaves around the point where they join the stem, so they stay attached (1 = original size). */
+const SCALED_LEAVES: Record<string, number> = { "leaf-static-1": 0.85, "leaf-static-3": 0.8 };
+
+function editLeaves(scene: THREE.Object3D) {
+  const leaves = new Map<string, THREE.Object3D>();
+  const stem = new THREE.Box3();
+  scene.updateMatrixWorld(true);
+  scene.traverse((o) => {
+    if (nameOf(o).startsWith("leaf-static")) leaves.set(nameOf(o), o);
+    if ((o as THREE.Mesh).isMesh && partOf(o) === "stem") stem.expandByObject(o);
+  });
+  for (const name of REMOVED_LEAVES) leaves.get(name)?.removeFromParent();
+  if (stem.isEmpty()) return;
+
+  const stemCentre = stem.getCenter(new THREE.Vector3());
+  for (const name of MIRRORED_LEAVES) {
+    const leaf = leaves.get(name);
+    if (!leaf?.parent) continue;
+    // Mirror across the vertical plane through the stem, in the leaf's parent's space
+    // (FLOWER-1, which isn't rotated, so its x axis is the world's — left/right on screen).
+    const x = leaf.parent.worldToLocal(stemCentre.clone()).x;
+    const mirror = new THREE.Matrix4()
+      .makeTranslation(x, 0, 0)
+      .multiply(new THREE.Matrix4().makeScale(-1, 1, 1))
+      .multiply(new THREE.Matrix4().makeTranslation(-x, 0, 0));
+    leaf.applyMatrix4(mirror);
+  }
+  for (const [name, dy] of Object.entries(RAISED_LEAVES)) {
+    const leaf = leaves.get(name);
+    if (leaf) leaf.position.y += dy;
+  }
+
+  scene.updateMatrixWorld(true);
+  for (const [name, k] of Object.entries(SCALED_LEAVES)) {
+    const leaf = leaves.get(name);
+    if (!leaf?.parent) continue;
+    // Pivot where the leaf meets the stem: the stem's x, at the leaf's own height and depth.
+    const centre = new THREE.Box3().setFromObject(leaf).getCenter(new THREE.Vector3());
+    centre.x = stemCentre.x;
+    const pivot = leaf.parent.worldToLocal(centre);
+    const resize = new THREE.Matrix4()
+      .makeTranslation(pivot.x, pivot.y, pivot.z)
+      .multiply(new THREE.Matrix4().makeScale(k, k, k))
+      .multiply(new THREE.Matrix4().makeTranslation(-pivot.x, -pivot.y, -pivot.z));
+    leaf.applyMatrix4(resize);
+  }
+}
+
 export function prepareLily(scene: THREE.Object3D) {
+  // Once per loaded model: the loader caches it, and React may run the caller twice in
+  // development — mirroring a leaf twice would flip it straight back.
+  if (scene.userData.lilyPrepared) return;
+  scene.userData.lilyPrepared = true;
   for (const child of scene.children) child.scale.setScalar(1);
 
   const lights: THREE.Object3D[] = [];
@@ -92,6 +158,7 @@ export function prepareLily(scene: THREE.Object3D) {
     mesh.receiveShadow = true;
   });
   for (const light of lights) light.parent?.remove(light);
+  editLeaves(scene);
 }
 
 /** The four nav markers the homepage tracks (see components/spline/markers.ts). */

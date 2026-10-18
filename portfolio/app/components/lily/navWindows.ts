@@ -1,4 +1,4 @@
-import type { HoverOverlayId } from "../../../components/spline/HoverFigTreeContext";
+import type { HoverOverlayId } from "../spline/HoverFigTreeContext";
 
 // The glass nav windows that float over the flower — Figma "Mixed Media
 // Letters" (file MAeeEAh3liNy9GGgvPD6eK, frame 866:6474, 1728×1117).
@@ -31,7 +31,7 @@ export type NavWindow = {
   labelAt?: LabelCorner;
   /** A labeled window either links to a page… */
   href?: string;
-  /** …or, with no page yet, opens one of the homepage's full-screen hover overlays (on hover, focus or click). */
+  /** …or opens one of the homepage's full-screen hover screens instead (on hover, focus or click). */
   overlay?: HoverOverlayId;
   /** Figma Glass frost (blur radius, Figma px). Default 22. */
   frost?: number;
@@ -56,7 +56,7 @@ const FAR = 0.8;
 
 export const NAV_WINDOWS: NavWindow[] = [
   // ABOUT and the small window over it (866:6498) sit a little higher than the pull would put them.
-  { node: "866:6488", x: 735, y: 147, w: 208, h: 105, label: "ABOUT", labelAt: "top-left", href: "/about", nudge: { y: -40 }, depth: FAR },
+  { node: "866:6488", x: 735, y: 147, w: 208, h: 105, label: "ABOUT", labelAt: "top-left", overlay: "about", nudge: { y: -40 }, depth: FAR },
   { node: "866:6491", x: 485, y: 221, w: 208, h: 105, label: "HOME", labelAt: "bottom-left", href: "/", depth: MID },
   // Figma's label reads "BUIDLING"; corrected here.
   { node: "866:6494", x: 1047, y: 214, w: 304, h: 138, label: "BUILDING RADIO'S FUTURE", labelAt: "top-right", href: "/work/radio", depth: MID },

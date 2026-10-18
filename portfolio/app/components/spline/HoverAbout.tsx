@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useHoverFigTree } from "./HoverFigTreeContext";
-import { NameTitle, RepeatingWordLines } from "./HomeBackground";
+import { RepeatingWordLines } from "./HomeBackground";
 
 // Figma "About-belt-1" through "About-belt-5" (nodes 411:1285, 532:239,
 // 532:240, 411:1298, 411:1293) — a continuously-scrolling belt of photo
-// clusters + captions, inserted between the "HANNAH SHIN"/subtitle and the
-// 4 repeating word-lines that the home page's background (HomeBackground)
-// already renders — this page reuses those same two pieces (NameTitle,
-// RepeatingWordLines) rather than re-authoring them, per the brief ("same
-// elements as the main page").
+// clusters + captions, above the 4 repeating word-lines (RepeatingWordLines,
+// shared with HomeBackground). The "HANNAH SHIN" title and subtitle that
+// used to sit above the belt were removed (Hannah's call).
 type BeltImage = { src: string; ratio: string };
 type BeltCluster = { caption: string; images: BeltImage[] };
 
@@ -104,30 +102,23 @@ export function HoverAboutVisual() {
   const outerRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  // NameTitle is rendered separately below, absolutely positioned at the
-  // exact same spot HomeBackground puts it (top-[4vh], no scale) — so it
-  // always matches the home page exactly instead of drifting with however
-  // much this page's own scale-fit shrink happens to apply. This spacer
-  // reserves the same amount of space inside the scaled flex column that
-  // NameTitle used to occupy there, so removing it from the flow doesn't
-  // make the belt/lines below jump up to fill the gap.
-  const titleRef = useRef<HTMLDivElement | null>(null);
-  const [titleHeight, setTitleHeight] = useState(0);
-
   // Same fit-to-space scaling as the other hover overlays — see
   // HoverFigTree.tsx for the full reasoning.
   const NON_FULLSCREEN_BOOST = 1.15;
   const [scale, setScale] = useState(1);
+  // Centre the belt and word lines vertically when they fit; on screens too short for them,
+  // stay top-aligned so the overlay's scroll can still reach the top.
+  const [fits, setFits] = useState(true);
   useEffect(() => {
     const recompute = () => {
       const outer = outerRef.current;
       const content = contentRef.current;
       if (!outer || !content) return;
-      setTitleHeight(titleRef.current?.offsetHeight ?? 0);
       const fitRatio = outer.clientHeight / content.scrollHeight;
       const nextScale = Math.min(1, fitRatio * NON_FULLSCREEN_BOOST);
       setScale(nextScale);
       const renderedHeight = content.scrollHeight * nextScale;
+      setFits(renderedHeight <= outer.clientHeight);
       setMaxScroll("about", Math.max(0, renderedHeight - outer.clientHeight));
     };
     recompute();
@@ -142,15 +133,9 @@ export function HoverAboutVisual() {
       aria-hidden={!isActive}
       data-name="hover-about"
     >
-      {/* Same position as HomeBackground's own "HANNAH SHIN" — deliberately
-          outside the scaled/centered block below. */}
-      <div ref={titleRef} className="absolute left-1/2 top-[4vh] -translate-x-1/2">
-        <NameTitle />
-      </div>
-
       <div
         ref={outerRef}
-        className="flex h-full w-full flex-col items-center justify-start"
+        className={`flex h-full w-full flex-col items-center ${fits ? "justify-center" : "justify-start"}`}
         style={{ padding: "3vh 4vw" }}
       >
         <div
@@ -162,7 +147,6 @@ export function HoverAboutVisual() {
             transformOrigin: "center",
           }}
         >
-          <div aria-hidden style={{ height: titleHeight, width: "100%" }} />
           <PhotoBelt />
           <RepeatingWordLines />
         </div>

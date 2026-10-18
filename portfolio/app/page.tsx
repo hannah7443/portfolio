@@ -1,12 +1,11 @@
-import FlowerScene from "./components/spline/FlowerScene";
-import { HoverFigTreeProvider } from "./components/spline/HoverFigTreeContext";
+import HomeLilyClient from "./components/lily/HomeLilyClient";
 
+// The Spline flower (components/spline/FlowerScene.tsx) and its hover screens are kept in the
+// repo; only the playground and about screens are still shown, via their glass windows.
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen flex-col bg-black">
-      <HoverFigTreeProvider>
-        <FlowerScene />
-      </HoverFigTreeProvider>
+    <div data-page="home" className="relative h-screen w-full bg-black">
+      <HomeLilyClient />
     </div>
   );
 }

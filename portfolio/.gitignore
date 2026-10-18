@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ABC Favorit Mono trial font: local preview only. Its licence forbids storing
+# it on public servers or redistributing it, so it must never be committed or
+# deployed (the site falls back to IBM Plex Mono without it).
+/public/fonts/*Trial*

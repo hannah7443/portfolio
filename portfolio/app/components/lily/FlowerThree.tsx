@@ -3,6 +3,7 @@
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { LiquidGlass } from "apple-liquid-glass-webgl";
 import {
+  type ReactNode,
   Suspense,
   useCallback,
   useEffect,
@@ -14,27 +15,28 @@ import {
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import GlassWindows, { type Artboard } from "./GlassWindows";
-import { HoverFigTreeProvider } from "../../components/spline/HoverFigTreeContext";
+import { HoverFigTreeProvider } from "../spline/HoverFigTreeContext";
 import {
   HoverPlaygroundClickCatcher,
   HoverPlaygroundLinks,
   HoverPlaygroundVisual,
-} from "../../components/spline/HoverPlayground";
-import { PlaygroundVideoOverlay } from "../../components/spline/PlaygroundVideoOverlay";
-import { isAnther, isPetal, isStemPart, MODEL_URL, prepareLily } from "./_lib/lily";
-import { FIGMA_ANTHERS, FIGMA_PETALS, NAV_WINDOWS } from "./_lib/navWindows";
+} from "../spline/HoverPlayground";
+import { PlaygroundVideoOverlay } from "../spline/PlaygroundVideoOverlay";
+import { HoverAboutClickCatcher, HoverAboutVisual } from "../spline/HoverAbout";
+import { isAnther, isPetal, isStemPart, MODEL_URL, prepareLily } from "./lily";
+import { FIGMA_ANTHERS, FIGMA_PETALS, NAV_WINDOWS } from "./navWindows";
 
-// Test bed for replacing the homepage's Spline flower with plain three.js.
-// Framing, lighting and cursor follow mirror components/spline/
-// cameraFollow.ts and the Spline scene's own settings, so the two can be
-// compared side by side. The glass nav windows (GlassWindows) float over it,
-// refracting the live scene.
+// The homepage lily in plain three.js (it replaced the Spline scene in
+// components/spline/FlowerScene.tsx, which is kept but no longer used).
+// Framing, lighting and cursor follow mirror the Spline version. The glass
+// nav windows (GlassWindows) float over it, refracting the live scene.
+// Also mounted on /lab/flower as a test bed.
 
 // --- Camera: same numbers as cameraFollow.ts, except the zoom ---------------
 const MAX_SWEEP_DEGREES = 35;
 const FOLLOW_DAMPING = 0.08;
-/** Camera distance as a share of the authored one; lower = closer = bigger flower. The homepage uses 0.7; 0.62 draws it ~13% larger. */
-const ZOOM_FACTOR = 0.62;
+/** Camera distance as a share of the authored one; lower = closer = bigger flower (the old Spline homepage used 0.7). The glass windows scale with it. */
+const ZOOM_FACTOR = 0.68;
 const VERTICAL_PAN = -150;
 const BASELINE_CAMERA = new THREE.Vector3(
   81.698,
@@ -315,7 +317,11 @@ function Lily({ onArtboard }: { onArtboard: (a: Artboard) => void }) {
   return <primitive object={scene} />;
 }
 
-export default function FlowerThree() {
+/**
+ * `background` is drawn behind everything (the flower, the playground
+ * screen) — on the homepage, the "hannah shin" name strip.
+ */
+export default function FlowerThree({ background }: { background?: ReactNode }) {
   const container = useRef<HTMLDivElement | null>(null);
   const [artboard, setArtboard] = useState<Artboard | null>(null);
   const onArtboard = useCallback((a: Artboard) => setArtboard(a), []);
@@ -340,9 +346,12 @@ export default function FlowerThree() {
   return (
     <HoverFigTreeProvider>
       <div ref={container} className="relative h-full w-full overflow-hidden">
-        {/* The PLAYGROUND window's full-screen overlay, stacked as on the homepage: visual behind
-          the flower, click-catcher (z-5, click closes) above it, glass windows (z-10) above that. */}
+        {background}
+        {/* The PLAYGROUND and ABOUT windows' full-screen hover screens, stacked as on the old
+          homepage: visuals behind the flower, click-catchers (z-5, click closes) above it, glass
+          windows (z-10) above that. */}
         <HoverPlaygroundVisual />
+        <HoverAboutVisual />
         <Canvas
           shadows="percentage"
           dpr={[1, 2]}
@@ -370,6 +379,7 @@ export default function FlowerThree() {
         </Canvas>
 
         <HoverPlaygroundClickCatcher />
+        <HoverAboutClickCatcher />
         <HoverPlaygroundLinks />
         {artboard && <GlassWindows artboard={artboard} />}
         {/* Above the glass (z-10), clipped to the stem-in-front window; hidden until measured. */}

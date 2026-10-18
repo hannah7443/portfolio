@@ -3,6 +3,19 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
 @import "tailwindcss";
 
+/* ABC Favorit Mono (glass window chips). Local preview only: the trial file's
+   licence forbids storing it on public servers or redistributing it, so it's
+   git-ignored and never deployed — without it this face simply fails to load
+   and the chips fall back to IBM Plex Mono. Swap in licensed files (ideally
+   the Medium weight, as in Figma) to use it on the live site. */
+@font-face {
+  font-family: "ABC Favorit Mono";
+  src: url("/fonts/ABCFavoritMonoTrial-Book.otf") format("opentype");
+  font-weight: 350;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #faf6ec;
   --foreground: #171717;
@@ -99,7 +112,7 @@ body {
   }
 }
 
-/* Glass nav windows (app/lab/flower/GlassWindows.tsx) without WebGL2:
+/* Glass nav windows (app/components/lily/GlassWindows.tsx) without WebGL2:
    apple-liquid-glass-webgl falls back to backdrop-filter and marks the
    element data-liquid-glass="fallback". Keep it deliberate — a dark frosted
    pane. */
@@ -108,4 +121,12 @@ body {
   background: rgba(0, 0, 0, 0.35);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+}
+
+/* Homepage: black behind everything, so scrolling past the hero or
+   overscrolling (rubber-banding) shows black instead of the cream page
+   background used elsewhere. */
+html:has([data-page="home"]),
+html:has([data-page="home"]) body {
+  background: #000;
 }
