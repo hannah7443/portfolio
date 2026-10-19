@@ -1,6 +1,6 @@
 import { STYLES, styleFor } from "./renderers";
 import { LOOP_SECONDS, phaseAt, planLoop, slotAt, type LoopPlan, type PhaseName } from "./timeline";
-import type { Letter, Rect, RenderInfo, Slot, StyleParams } from "./types";
+import type { Letter, Rect, RenderInfo, Slot, StyleId, StyleParams } from "./types";
 
 // Owns the clock, the timeline lookup and drawing. React only mounts the
 // canvas and drives tick()/draw() from one requestAnimationFrame loop.
@@ -15,6 +15,10 @@ const FIGMA_CELL = 16;
 
 /** During the still beat, Solid's flicker runs at this fraction of its normal amount (breathing is held). */
 const STILL_FLICKER_SCALE = 0.5;
+/** Entrance (homepage intro): seconds between each letter cutting in, left to right. */
+const ENTRANCE_STEP = 0.07;
+/** Entrance style for the letters whose own style is solid, so every letter cuts in patterned (Hannah's call). */
+const ENTRANCE_INSTEAD_OF_SOLID: StyleId[] = ["crossStitch", "dots"];
 /** Gap between "hannah" and "shin" when they stack on two lines, in Figma px. */
 const LINE_GAP = 2 * FIGMA_CELL;
 
@@ -119,11 +123,29 @@ export class NameEngine {
   private size = { width: 0, height: 0 };
 
   private readonly fit: Fit;
+  /** Letters cut in one by one, left to right, over the first moments of the clock (once only). */
+  private readonly entrance: boolean;
+  /** Per letter: the style it cuts in with, and when (global seconds) the timeline takes over from it. */
+  private entranceSlots: { slot: StyleId; until: number }[] = [];
 
-  constructor(words: Letter[][], fit: Fit = LAB_FIT) {
+  constructor(words: Letter[][], fit: Fit = LAB_FIT, { entrance = false } = {}) {
     this.words = words;
     this.letters = words.flat();
     this.fit = fit;
+    this.entrance = entrance;
+    if (entrance) {
+      // Each letter holds its entrance style through the first loop's opening rest and still,
+      // until its own first styled interval begins, so it never shows the plain solid in between.
+      let solids = 0;
+      const first = this.plan(0);
+      this.entranceSlots = this.letters.map((letter, i) => ({
+        slot:
+          letter.ownStyle === "solid"
+            ? ENTRANCE_INSTEAD_OF_SOLID[solids++ % ENTRANCE_INSTEAD_OF_SOLID.length]
+            : letter.ownStyle,
+        until: first.intervals[i].find((iv) => iv.slot !== "still")?.start ?? 0,
+      }));
+    }
   }
 
   get loopIndex() {
@@ -155,6 +177,8 @@ export class NameEngine {
   /** The letter's slot plus the global time it started. */
   private slotWithStart(letterIndex: number): { slot: Slot; since: number } {
     if (this.forced) return { slot: this.forced, since: this.forcedSince };
+    const entering = this.entranceSlots[letterIndex];
+    if (entering && this.time < entering.until) return { slot: entering.slot, since: letterIndex * ENTRANCE_STEP };
     const { slot, start } = slotAt(this.plan(), letterIndex, this.loopTime);
     return { slot, since: this.loopIndex * LOOP_SECONDS + start };
   }
@@ -225,6 +249,8 @@ export class NameEngine {
     const unified = this.forced !== null || (this.phase === "unified" && states.every((s) => s.slot === states[0].slot));
 
     for (const s of states) {
+      // Not cut in yet: leave the paper showing.
+      if (this.entrance && this.time < s.info.index * ENTRANCE_STEP) continue;
       s.info.unified = unified;
       // Rest is the moving solid (Solid's breathing).
       if (s.slot === "rest") STYLES.solid.draw(ctx, s.letter, s.box, this.time, this.params, s.info);

@@ -26,11 +26,14 @@ export default function NameCanvas({ variant = "lab" }: { variant?: NameCanvasVa
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // Safe to touch the DOM here: this component is only ever loaded with
   // ssr: false (see NameCanvasClient), and masks are rasterized via canvas.
+  const [reducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [{ engine, aspect }] = useState(() => {
     const words = buildWords();
-    return { engine: new NameEngine(words, variant === "strip" ? STRIP_FIT : LAB_FIT), aspect: nameAspect(words) };
+    const strip = variant === "strip";
+    // The homepage strip opens with the letters cutting in left to right (not under reduced motion: no loop runs there).
+    const engine = new NameEngine(words, strip ? STRIP_FIT : LAB_FIT, { entrance: strip && !reducedMotion });
+    return { engine, aspect: nameAspect(words) };
   });
-  const [reducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   useEffect(() => {
     const wrap = wrapRef.current;

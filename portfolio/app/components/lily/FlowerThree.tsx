@@ -317,16 +317,39 @@ function Lily({ onArtboard }: { onArtboard: (a: Artboard) => void }) {
   return <primitive object={scene} />;
 }
 
+/** How long the flower and its windows take to fade in once `revealed`. */
+const REVEAL_FADE = "opacity 900ms ease";
+/** With reduced motion they appear at once (beats the inline transition). */
+const NO_FADE_IF_REDUCED = "motion-reduce:transition-none!";
+
 /**
  * `background` is drawn behind everything (the flower, the playground
  * screen) — on the homepage, the "hannah shin" name strip.
+ *
+ * `onReady` fires once the lily has loaded and been measured; until
+ * `revealed`, the flower, glass and stem layer stay invisible (still
+ * rendering underneath) — the homepage holds them back for its intro.
  */
-export default function FlowerThree({ background }: { background?: ReactNode }) {
+export default function FlowerThree({
+  background,
+  onReady,
+  revealed = true,
+}: {
+  background?: ReactNode;
+  onReady?: () => void;
+  revealed?: boolean;
+}) {
   const container = useRef<HTMLDivElement | null>(null);
   const [artboard, setArtboard] = useState<Artboard | null>(null);
   const onArtboard = useCallback((a: Artboard) => setArtboard(a), []);
   const stemCanvas = useRef<HTMLCanvasElement | null>(null);
   const [stemClip, setStemClip] = useState<string | null>(null);
+  const reveal = { opacity: revealed ? 1 : 0, transition: REVEAL_FADE };
+
+  const ready = artboard !== null;
+  useEffect(() => {
+    if (ready) onReady?.();
+  }, [ready, onReady]);
 
   // Clip the stem-in-front layer to its window, re-measured whenever the windows move.
   useEffect(() => {
@@ -353,6 +376,8 @@ export default function FlowerThree({ background }: { background?: ReactNode }) 
         <HoverPlaygroundVisual />
         <HoverAboutVisual />
         <Canvas
+          style={reveal}
+          className={NO_FADE_IF_REDUCED}
           shadows="percentage"
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: true }}
@@ -381,13 +406,17 @@ export default function FlowerThree({ background }: { background?: ReactNode }) 
         <HoverPlaygroundClickCatcher />
         <HoverAboutClickCatcher />
         <HoverPlaygroundLinks />
-        {artboard && <GlassWindows artboard={artboard} />}
+        {/* z-10 here too, so the windows keep their place in the stack (see GlassWindows).
+          inert until revealed, so the invisible windows can't be hovered, clicked or tabbed to. */}
+        <div className={`pointer-events-none absolute inset-0 z-10 ${NO_FADE_IF_REDUCED}`} style={reveal} inert={!revealed}>
+          {artboard && <GlassWindows artboard={artboard} />}
+        </div>
         {/* Above the glass (z-10), clipped to the stem-in-front window; hidden until measured. */}
         <canvas
           ref={stemCanvas}
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-[11] h-full w-full"
-          style={{ clipPath: stemClip ?? "inset(100%)" }}
+          className={`pointer-events-none absolute inset-0 z-[11] h-full w-full ${NO_FADE_IF_REDUCED}`}
+          style={{ ...reveal, clipPath: stemClip ?? "inset(100%)" }}
         />
         <PlaygroundVideoOverlay />
       </div>
