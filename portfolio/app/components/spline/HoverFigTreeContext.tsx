@@ -65,6 +65,13 @@ const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min)
  */
 export function HoverFigTreeProvider({ children, resting = null }: { children: ReactNode; resting?: HoverOverlayId | null }) {
   const [active, setActiveState] = useState<HoverOverlayId | null>(resting);
+  // The provider outlives navigation between /, /about and /contact, so a new resting screen
+  // replaces whatever is showing (adjusted during render, not in an effect).
+  const [prevResting, setPrevResting] = useState(resting);
+  if (resting !== prevResting) {
+    setPrevResting(resting);
+    setActiveState(resting);
+  }
   const [scrollOffset, setScrollOffset] = useState<Partial<Record<HoverOverlayId, number>>>({});
   const maxScrollRef = useRef<Partial<Record<HoverOverlayId, number>>>({});
   const [playgroundOverlayTile, setPlaygroundOverlayTile] = useState<string | null>(null);
