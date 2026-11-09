@@ -220,7 +220,11 @@ export class NameEngine {
   }
 
   tick(dt: number) {
-    if (!this.paused) this.time += Math.min(dt, 0.1);
+    if (this.paused) return;
+    // Steps are capped so a stalled frame can't skip the loop ahead, except while the letters cut
+    // in: those keep to real time, so a busy page (the flower loading) can't slow them down.
+    const entering = this.entrance && this.time < this.letters.length * ENTRANCE_STEP;
+    this.time += entering ? dt : Math.min(dt, 0.1);
   }
 
   resize(width: number, height: number, dpr: number) {

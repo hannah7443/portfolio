@@ -24,8 +24,8 @@ export type NameCanvasVariant = "lab" | "strip";
 export default function NameCanvas({ variant = "lab" }: { variant?: NameCanvasVariant }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  // Safe to touch the DOM here: this component is only ever loaded with
-  // ssr: false (see NameCanvasClient), and masks are rasterized via canvas.
+  // Safe to touch the DOM here: NameCanvasClient only renders this in the
+  // browser, and masks are rasterized via canvas.
   const [reducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [{ engine, aspect }] = useState(() => {
     const words = buildWords();
