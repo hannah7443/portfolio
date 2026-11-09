@@ -38,7 +38,7 @@ const FOLLOW_DAMPING = 0.08;
 /** Camera distance as a share of the authored one; lower = closer = bigger flower (the old Spline homepage used 0.7). The glass windows scale with it. */
 const ZOOM_FACTOR = 0.68;
 const VERTICAL_PAN = -150;
-const BASELINE_CAMERA = new THREE.Vector3(
+export const BASELINE_CAMERA = new THREE.Vector3(
   81.698,
   1449.223 + VERTICAL_PAN,
   1104.988,
@@ -55,14 +55,14 @@ const BASELINE_TARGET = new THREE.Vector3(
  * renders, so what's on screen looks here instead (read from the live
  * Spline camera). Matching it keeps the flower framed the same.
  */
-const RENDERED_LOOK_AT = new THREE.Vector3(5.6, 731.62, 140.05);
+export const RENDERED_LOOK_AT = new THREE.Vector3(5.6, 731.62, 140.05);
 
 // --- Lighting: read from the live Spline scene's three.js objects ----------
 // (The GLB's exported light pointed the wrong way — this is what Spline
 // actually renders with.) Intensities are three.js units, as Spline uses them.
 
 /** Spline's "ambient" is a hemisphere light: light grey from above, mid grey from below — that's what separates upward faces from side/under faces. */
-const HEMI = { sky: "#d3d3d3", ground: "#828282", intensity: 0.75 * Math.PI };
+export const HEMI = { sky: "#d3d3d3", ground: "#828282", intensity: 0.75 * Math.PI };
 /**
  * The sun: high and slightly front-right, aimed at the world origin, with
  * Spline's shadow box. Spline's own intensity is 0.7π; 0.85π keeps the block
@@ -87,8 +87,8 @@ const SUN = {
  * its live renderer runs with none — and ACES is what flattened this
  * version (it pulls bright tops down and dark sides up until the blocks blend).
  */
-const TONE_MAPPING = THREE.NoToneMapping;
-const EXPOSURE = 1;
+export const TONE_MAPPING = THREE.NoToneMapping;
+export const EXPOSURE = 1;
 
 const degToRad = (d: number) => (d * Math.PI) / 180;
 
@@ -98,7 +98,7 @@ const degToRad = (d: number) => (d * Math.PI) / 180;
  * three.js doesn't do that on its own, and without it the shadow area stays
  * at its tiny default and almost nothing casts a shadow.
  */
-function Sun() {
+export function Sun() {
   const light = useRef<THREE.DirectionalLight>(null);
   const scene = useThree((s) => s.scene);
   useLayoutEffect(() => {

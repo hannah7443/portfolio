@@ -51,6 +51,12 @@ export const isStemPart = (mesh: THREE.Object3D) => {
   return part === "anther" || part === "filament" || part === "stem";
 };
 
+/** The stem and leaves — everything below the flower head (left out of the favicon). */
+export const isStemOrLeaf = (mesh: THREE.Object3D) => {
+  const part = partOf(mesh);
+  return part === "stem" || part === "leaf";
+};
+
 function partOf(mesh: THREE.Object3D): Part | null {
   const own = nameOf(mesh);
   for (let o: THREE.Object3D | null = mesh.parent; o; o = o.parent) {
