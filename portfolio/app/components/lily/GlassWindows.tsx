@@ -36,7 +36,7 @@ export type Artboard = { left: number; top: number; sx: number; sy: number };
  * (hairline), edge light (rim) and a glint on the lit edge (highlight), plus
  * enough dark tint that each pane reads as faintly lifted off the black page.
  */
-const GLASS = {
+export const GLASS = {
   tint: 0.3,
   tintTone: "dark" as const,
   material: {

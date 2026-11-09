@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 import { LazyVideo } from "../../components/LazyVideo";
+import GlassSectionNav, { useActiveSection } from "../../components/GlassSectionNav";
 
 // Figma "Main Tree" (node 2011:127): a dark case-study page with a
-// scroll-spy directory on the left whose fig icon slides down next to
-// whichever heading is currently active, and a hero cover video under
+// scroll-spy directory on the left (GlassSectionNav) that marks whichever
+// heading is currently active, and a hero cover video under
 // "Overview". Content for each section below the hero is filled in
 // separately.
 // COVER_VIDEO stays a plain eager <video> — it's the hero, visible the
@@ -22,19 +22,17 @@ const CREATE_FIGMENT_VIDEO = "/fig-tree-demos/Create-Figment.mp4";
 const FIGMENT_STATE_VIDEO = "/fig-tree-demos/Figment-State-Final.mp4";
 const SUB_BRANCH_VIDEO = "/fig-tree-demos/Sub-branch-demo.mp4";
 const PHILOSOPHICAL_VIDEO = "/fig-tree-demos/philosophical_video.MOV";
-const FIG_ICON = "/fig-tree-demos/icons/fig-cross-section.png";
 const BLURRED_BRANCH = "/fig-tree-demos/icons/blurred-fig-branch.png";
+const FIG_ICON = "/fig-tree-demos/icons/fig-cross-section.png";
 
 const NAV_ITEMS = [
   { id: "overview", label: "OVERVIEW" },
   { id: "problem", label: "PROBLEM" },
   { id: "concept", label: "CONCEPT" },
   { id: "challenges", label: "CHALLENGES" },
-  { id: "design-highlights", label: "DESIGN HIGHLIGHTS" },
+  { id: "design-highlights", label: "DESIGN\nHIGHLIGHTS" },
   { id: "reflection", label: "REFLECTION" },
 ] as const;
-
-type SectionId = (typeof NAV_ITEMS)[number]["id"];
 
 const INFO_COLUMNS = [
   { label: "TIMELINE", value: "June 2026" },
@@ -43,44 +41,33 @@ const INFO_COLUMNS = [
   { label: "SKILLS", value: "Product Design, Design Systems" },
 ] as const;
 
+// Figma 1053:1730 ("CONCEPT"): IBM Plex Mono Medium in white on a #32431b
+// block that hugs the text, scaled down from Figma's 28.929px to 18px with
+// roomier side padding. Whatever follows it starts 16px below, overriding
+// that element's own top margin.
+function SectionHeading({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <h2
+      className={`font-ibm-plex-mono w-fit border border-solid border-[#32431b] bg-[#32431b] px-3 text-lg [&+*]:mt-4 font-medium uppercase leading-normal tracking-[-0.04em] text-white ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}
+
+// Colour from Figma 1053:1780 ("Productivity Redefined…").
 function SubHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-ibm-plex-mono mt-10 text-xl font-normal uppercase tracking-wide text-[#5b9a3c]">{children}</h3>
+    <h3 className="font-ibm-plex-mono mt-10 text-xl font-normal uppercase tracking-wide text-[#c4dc81]">{children}</h3>
   );
 }
 
 export default function FigTreePage() {
-  const [activeId, setActiveId] = useState<SectionId>(NAV_ITEMS[0].id);
-  const [iconTop, setIconTop] = useState(0);
-  const itemRefs = useRef<Partial<Record<SectionId, HTMLAnchorElement | null>>>({});
+  const activeId = useActiveSection(NAV_ITEMS.map((item) => item.id));
 
-  // Scroll-spy: whichever section's heading is nearest the top of the
-  // "active" band (upper ~30% of the viewport) becomes the active nav item.
-  useEffect(() => {
-    const sections = NAV_ITEMS.map((item) => document.getElementById(item.id)).filter(
-      (el): el is HTMLElement => el !== null,
-    );
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length === 0) return;
-        const topMost = visible.reduce((a, b) => (a.boundingClientRect.top < b.boundingClientRect.top ? a : b));
-        setActiveId(topMost.target.id as SectionId);
-      },
-      { rootMargin: "-15% 0px -70% 0px", threshold: 0 },
-    );
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
-
-  // Slide the fig icon next to whichever directory entry is active.
-  useEffect(() => {
-    const el = itemRefs.current[activeId];
-    if (el) setIconTop(el.offsetTop);
-  }, [activeId]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f1f2f3] text-[#1f3d12]">
+    <div data-page="fig-tree" className="relative min-h-screen overflow-hidden bg-black text-[#1f3d12]">
       {/* Decorative blurred branches. The directory sidebar's wrapper now
           stretches to the full content height so its sticky child stays
           pinned near the top of the viewport for the entire scroll range,
@@ -109,41 +96,19 @@ export default function FigTreePage() {
       </Link>
 
       <div className="relative z-10 px-10 pb-32 pt-8 md:px-16">
-        <h1 className="font-ibm-plex-mono text-lg font-bold uppercase tracking-[0.25em] md:pl-64 md:text-xl">
+        {/* Figma 1053:1729 + 1053:1781: 64px in white, with the fig cross-section
+            icon (90×112) to its left; set in Redaction 50 Italic rather than the
+            Figma's Geist. Sized in em so it scales down with the title on
+            narrower screens. */}
+        <h1 className="font-redaction-50 flex items-center gap-[0.48em] text-[clamp(2rem,3.4vw,4rem)] font-normal italic leading-none text-white md:pl-64">
+          <img src={FIG_ICON} alt="" aria-hidden="true" className="h-[1.75em] w-[1.4em] shrink-0 object-cover" />
           Fig Tree Notes App
         </h1>
 
         <div className="mt-4">
-          {/* Directory. Fixed (not sticky) so it's pinned to the viewport
-              and stays visible regardless of how far the content beside it
-              is scrolled. Positioned below the fixed "back to projects"
-              link so it never gets cut off at the top. */}
-          <nav className="fixed left-10 top-24 z-20 hidden w-52 md:block md:left-16">
-            <div className="relative">
-              <img
-                src={FIG_ICON}
-                alt=""
-                aria-hidden="true"
-                className="absolute -left-10 h-9 w-7 -translate-y-3 transition-[top] duration-300 ease-out"
-                style={{ top: iconTop }}
-              />
-              <ul className="font-ibm-plex-mono flex flex-col gap-4 text-lg">
-                {NAV_ITEMS.map((item) => (
-                  <li key={item.id}>
-                    <a
-                      ref={(el) => {
-                        itemRefs.current[item.id] = el;
-                      }}
-                      href={`#${item.id}`}
-                      className={activeId === item.id ? "font-bold text-[#2f5d1e]" : "font-normal text-[#2f5d1e]/60"}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </nav>
+          {/* Directory: the glass nav from Figma, fixed to the viewport so it
+              stays visible however far the content beside it is scrolled. */}
+          <GlassSectionNav items={NAV_ITEMS} activeId={activeId} />
 
           {/* Content */}
           <main className="min-w-0 md:pl-64">
@@ -157,7 +122,7 @@ export default function FigTreePage() {
                 playsInline
               />
 
-              <h2 className="font-ibm-plex-mono mt-8 text-3xl font-bold uppercase tracking-wide text-[#2f5d1e]">Overview</h2>
+              <SectionHeading className="mt-8">Overview</SectionHeading>
 
               <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
                 {INFO_COLUMNS.map((col) => (
@@ -183,7 +148,7 @@ export default function FigTreePage() {
             </section>
 
             <section id="problem" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#2f5d1e]">Problem</h2>
+              <SectionHeading>Problem</SectionHeading>
 
               <p className="font-sans tracking-wide mt-6 w-full text-xl italic leading-relaxed text-[#8A8E90]">
                 &ldquo;I saw my life branching out before me like the green fig tree&hellip;I wanted each and every
@@ -204,7 +169,7 @@ export default function FigTreePage() {
             </section>
 
             <section id="concept" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#2f5d1e]">Concept</h2>
+              <SectionHeading>Concept</SectionHeading>
 
               <SubHeading>Productivity Redefined: Let Your Ideas Ripen</SubHeading>
               <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
@@ -227,7 +192,7 @@ export default function FigTreePage() {
             </section>
 
             <section id="challenges" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#2f5d1e]">Challenges</h2>
+              <SectionHeading>Challenges</SectionHeading>
 
               <SubHeading>Make Idea Generation Low-Stakes</SubHeading>
               <p className="font-sans tracking-wide mt-4 w-full text-base leading-relaxed text-[#8A8E90]">
@@ -251,7 +216,7 @@ export default function FigTreePage() {
             </section>
 
             <section id="design-highlights" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#2f5d1e]">Design Highlights</h2>
+              <SectionHeading>Design Highlights</SectionHeading>
 
               <SubHeading>Orchard</SubHeading>
               <LazyVideo src={ORCHARD_VIDEO} className="mt-4 w-full rounded-[2.5rem] object-cover" />
@@ -287,7 +252,7 @@ export default function FigTreePage() {
             </section>
 
             <section id="reflection" className="scroll-mt-28 pt-24">
-              <h2 className="font-ibm-plex-mono text-3xl font-bold uppercase tracking-wide text-[#2f5d1e]">Reflection: What I Learned</h2>
+              <SectionHeading>Reflection: What I Learned</SectionHeading>
 
               <ol className="font-sans tracking-wide mt-6 w-full list-decimal space-y-4 pl-5 text-base leading-relaxed text-[#8A8E90]">
                 <li>

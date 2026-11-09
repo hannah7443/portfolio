@@ -16,12 +16,24 @@
   font-display: swap;
 }
 
+/* Redaction 50 (MCKL, SIL Open Font License 1.1 — see
+   public/fonts/Redaction-50-LICENSE.txt). Only the italic is used, for the
+   fig tree case study's title. */
+@font-face {
+  font-family: "Redaction 50";
+  src: url("/fonts/redaction-50-latin-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --background: #faf6ec;
   --foreground: #171717;
   --font-red-hat-mono: "Red Hat Mono", monospace;
   --font-karla: "Karla", sans-serif;
   --font-ibm-plex-mono: "IBM Plex Mono", monospace;
+  --font-redaction-50: "Redaction 50", Georgia, serif;
 }
 
 @theme inline {
@@ -32,6 +44,7 @@
   --font-red-hat-mono: var(--font-red-hat-mono);
   --font-karla: var(--font-karla);
   --font-ibm-plex-mono: var(--font-ibm-plex-mono);
+  --font-redaction-50: var(--font-redaction-50);
 }
 
 body {
@@ -123,10 +136,14 @@ body {
   backdrop-filter: blur(14px);
 }
 
-/* Homepage: black behind everything, so scrolling past the hero or
-   overscrolling (rubber-banding) shows black instead of the cream page
+/* Homepage and the fig tree and radio case studies: black behind everything, so
+   scrolling past the hero or overscrolling (rubber-banding) shows black instead of the cream page
    background used elsewhere. */
 html:has([data-page="home"]),
-html:has([data-page="home"]) body {
+html:has([data-page="home"]) body,
+html:has([data-page="fig-tree"]),
+html:has([data-page="fig-tree"]) body,
+html:has([data-page="radio"]),
+html:has([data-page="radio"]) body {
   background: #000;
 }
