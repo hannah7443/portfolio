@@ -1,10 +1,12 @@
+import HomeLilyClient from "../components/lily/HomeLilyClient";
+
+// A direct link to the CONTACT window's screen: the homepage with LET'S CONNECT (Figma "About",
+// node 1071:2908) open bottom-right over the "hannah shin" letters. On the homepage the window
+// itself just opens that screen, on hover or click, without coming here.
 export default function ContactPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6 pt-24 text-center">
-      <h1 className="font-red-hat-mono text-3xl">contact</h1>
-      <p className="font-red-hat-mono mt-4 max-w-md text-black/60">
-        Placeholder page for the contact window on the home page flower. Content coming soon.
-      </p>
+    <div data-page="contact" className="relative h-screen w-full bg-black">
+      <HomeLilyClient restingOverlay="contact" />
     </div>
   );
 }

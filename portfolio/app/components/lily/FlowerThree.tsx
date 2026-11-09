@@ -15,14 +15,14 @@ import {
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import GlassWindows, { type Artboard } from "./GlassWindows";
-import { HoverFigTreeProvider } from "../spline/HoverFigTreeContext";
+import { HoverFigTreeProvider, type HoverOverlayId } from "../spline/HoverFigTreeContext";
 import {
   HoverPlaygroundClickCatcher,
   HoverPlaygroundLinks,
   HoverPlaygroundVisual,
 } from "../spline/HoverPlayground";
 import { PlaygroundVideoOverlay } from "../spline/PlaygroundVideoOverlay";
-import { HoverAboutClickCatcher, HoverAboutVisual } from "../spline/HoverAbout";
+import { HoverAboutClickCatcher, HoverAboutLinks, HoverAboutVisual } from "../spline/HoverAbout";
 import { isAnther, isPetal, isStemPart, MODEL_URL, prepareLily } from "./lily";
 import { FIGMA_ANTHERS, FIGMA_PETALS, NAV_WINDOWS } from "./navWindows";
 
@@ -334,10 +334,13 @@ export default function FlowerThree({
   background,
   onReady,
   revealed = true,
+  restingOverlay = null,
 }: {
   background?: ReactNode;
   onReady?: () => void;
   revealed?: boolean;
+  /** The hover screen showing while no other is (see HoverFigTreeProvider). */
+  restingOverlay?: HoverOverlayId | null;
 }) {
   const container = useRef<HTMLDivElement | null>(null);
   const [artboard, setArtboard] = useState<Artboard | null>(null);
@@ -367,7 +370,7 @@ export default function FlowerThree({
   }, [artboard]);
 
   return (
-    <HoverFigTreeProvider>
+    <HoverFigTreeProvider resting={restingOverlay}>
       <div ref={container} className="relative h-full w-full overflow-hidden">
         {background}
         {/* The PLAYGROUND and ABOUT windows' full-screen hover screens, stacked as on the old
@@ -405,6 +408,7 @@ export default function FlowerThree({
 
         <HoverPlaygroundClickCatcher />
         <HoverAboutClickCatcher />
+        <HoverAboutLinks />
         <HoverPlaygroundLinks />
         {/* z-10 here too, so the windows keep their place in the stack (see GlassWindows).
           inert until revealed, so the invisible windows can't be hovered, clicked or tabbed to. */}

@@ -2,6 +2,7 @@
 
 import { LiquidGlass } from "apple-liquid-glass-webgl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { useHoverFigTree } from "../spline/HoverFigTreeContext";
 import {
@@ -154,6 +155,7 @@ function GlassWindow({
   elementRef: (el: HTMLElement | null) => void;
 }) {
   const { activate } = useHoverFigTree();
+  const router = useRouter();
 
   // Decorative: hidden from assistive tech, not focusable, and click-through so it never
   // blocks the labeled window it overlaps.
@@ -171,8 +173,9 @@ function GlassWindow({
   const chip = <Chip label={w.label} corner={w.labelAt ?? "top-left"} />;
   if (w.overlay) {
     const overlay = w.overlay;
-    // Opens one of the full-screen hover screens instead of navigating: on hover like the
-    // old homepage markers, and on focus/click so it works from the keyboard and on touch.
+    // Opens one of the full-screen hover screens: on hover like the old homepage markers, and on
+    // focus so it works from the keyboard. A click opens the window's page if it has one (ABOUT →
+    // /about, the same layout as a page), otherwise the screen, so it also works on touch.
     return (
       <button
         ref={elementRef}
@@ -183,7 +186,7 @@ function GlassWindow({
         aria-label={`${w.label} — show ${w.label.toLowerCase()} screen`}
         onMouseEnter={() => activate(overlay)}
         onFocus={() => activate(overlay)}
-        onClick={() => activate(overlay)}
+        onClick={() => (w.href ? router.push(w.href) : activate(overlay))}
       >
         {chip}
       </button>

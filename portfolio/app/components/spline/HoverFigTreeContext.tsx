@@ -9,7 +9,7 @@ import { createContext, useContext, useRef, useState, type ReactNode } from "rea
 // FlowerScene — can read it. Only one overlay id can be active at a time:
 // activating a new one simply replaces the old id, which is exactly the
 // "stays up until you hover another nav marker" behavior each overlay wants.
-export type HoverOverlayId = "fig-tree" | "radio" | "playground" | "about";
+export type HoverOverlayId = "fig-tree" | "radio" | "playground" | "about" | "contact";
 
 type HoverFigTreeContextValue = {
   /** id of the currently-active overlay, or null if none is showing. */
@@ -59,8 +59,12 @@ const HoverFigTreeContext = createContext<HoverFigTreeContextValue | null>(null)
 
 const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
 
-export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
-  const [active, setActiveState] = useState<HoverOverlayId | null>(null);
+/**
+ * `resting` is the overlay showing when nothing else is: none on the homepage, the about or
+ * contact screen on /about or /contact. Closing an overlay goes back to it.
+ */
+export function HoverFigTreeProvider({ children, resting = null }: { children: ReactNode; resting?: HoverOverlayId | null }) {
+  const [active, setActiveState] = useState<HoverOverlayId | null>(resting);
   const [scrollOffset, setScrollOffset] = useState<Partial<Record<HoverOverlayId, number>>>({});
   const maxScrollRef = useRef<Partial<Record<HoverOverlayId, number>>>({});
   const [playgroundOverlayTile, setPlaygroundOverlayTile] = useState<string | null>(null);
@@ -93,7 +97,7 @@ export function HoverFigTreeProvider({ children }: { children: ReactNode }) {
       value={{
         active,
         activate,
-        deactivate: () => setActiveState(null),
+        deactivate: () => setActiveState(resting),
         scrollOffset,
         setMaxScroll,
         addScroll,

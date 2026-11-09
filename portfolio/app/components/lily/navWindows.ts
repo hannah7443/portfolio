@@ -29,9 +29,9 @@ export type NavWindow = {
   /** Labeled windows are interactive; unlabeled ones are decorative. */
   label?: string;
   labelAt?: LabelCorner;
-  /** A labeled window either links to a page… */
+  /** A labeled window links to a page… */
   href?: string;
-  /** …or opens one of the homepage's full-screen hover screens instead (on hover, focus or click). */
+  /** …and/or opens one of the homepage's full-screen hover screens (on hover or focus; on click too, unless it has an href). */
   overlay?: HoverOverlayId;
   /** Figma Glass frost (blur radius, Figma px). Default 22. */
   frost?: number;
@@ -56,13 +56,13 @@ const FAR = 0.8;
 
 export const NAV_WINDOWS: NavWindow[] = [
   // ABOUT and the small window over it (866:6498) sit a little higher than the pull would put them.
-  { node: "866:6488", x: 735, y: 147, w: 208, h: 105, label: "ABOUT", labelAt: "top-left", overlay: "about", nudge: { y: -40 }, depth: FAR },
+  { node: "866:6488", x: 735, y: 147, w: 208, h: 105, label: "ABOUT", labelAt: "top-left", overlay: "about", href: "/about", nudge: { y: -40 }, depth: FAR },
   { node: "866:6491", x: 485, y: 221, w: 208, h: 105, label: "FIGTREE", labelAt: "top-left", href: "/work/fig-tree", depth: MID },
   // Figma's label reads "BUIDLING"; corrected here.
   { node: "866:6494", x: 1047, y: 214, w: 304, h: 138, label: "BUILDING RADIO'S FUTURE", labelAt: "top-right", href: "/work/radio", depth: MID },
   { node: "866:6484", x: 544, y: 495, w: 124, h: 199, label: "PLAYGROUND", labelAt: "bottom-left", overlay: "playground", depth: NEAR },
   // Figma: frost 10, depth 90 (the library's depth/refraction is shared across one canvas, so only frost differs).
-  { node: "866:6481", x: 1024, y: 523, w: 232, h: 143, label: "CONTACT", labelAt: "bottom-right", href: "/contact", frost: 10, depth: NEAR },
+  { node: "866:6481", x: 1024, y: 523, w: 232, h: 143, label: "CONTACT", labelAt: "bottom-right", overlay: "contact", frost: 10, depth: NEAR },
   { node: "866:6497", x: 550, y: 302, w: 124, h: 99, depth: MID }, // with FIGTREE (866:6491)
   { node: "866:6498", x: 754, y: 225, w: 85, h: 125, nudge: { y: -40 }, stemInFront: true, depth: FAR }, // with ABOUT
   { node: "866:6500", x: 1016, y: 289, w: 162, h: 125, depth: MID }, // with BUILDING RADIO'S FUTURE

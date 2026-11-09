@@ -1,170 +1,44 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import AboutLayout, { AboutConnect } from "../about/AboutLayout";
 import { useHoverFigTree } from "./HoverFigTreeContext";
-import { RepeatingWordLines } from "./HomeBackground";
 
-// Figma "About-belt-1" through "About-belt-5" (nodes 411:1285, 532:239,
-// 532:240, 411:1298, 411:1293) — a continuously-scrolling belt of photo
-// clusters + captions, above the 4 repeating word-lines (RepeatingWordLines,
-// shared with HomeBackground). The "HANNAH SHIN" title and subtitle that
-// used to sit above the belt were removed (Hannah's call).
-type BeltImage = { src: string; ratio: string };
-type BeltCluster = { caption: string; images: BeltImage[] };
-
-const CLUSTERS: BeltCluster[] = [
-  { caption: "HI, NICE TO MEET YOU!", images: [{ src: "/about-belt/1-nyc-portrait.jpg", ratio: "430 / 260" }] },
-  {
-    caption: "DUKE STUDENT",
-    images: [
-      { src: "/about-belt/2-duke-chapel.jpg", ratio: "203 / 256" },
-      { src: "/about-belt/2-garden-portrait.jpg", ratio: "192 / 256" },
-    ],
-  },
-  {
-    caption: "FIGMA CAMPUS LEADER",
-    images: [
-      { src: "/about-belt/3-figma-campus-leader-card.png", ratio: "258 / 258" },
-      { src: "/about-belt/3-figma-campus-leaders-group.png", ratio: "213 / 261" },
-    ],
-  },
-  {
-    caption: "COLLEGE RADIO DJ",
-    images: [
-      { src: "/about-belt/4-radio-booth.jpg", ratio: "191 / 255" },
-      { src: "/about-belt/4-wxdu-storefront.jpg", ratio: "341 / 256" },
-    ],
-  },
-  { caption: "PIANIST", images: [{ src: "/about-belt/5-pianist-hands.jpg", ratio: "448 / 257" }] },
-];
-
-function Cluster({ caption, images }: BeltCluster) {
-  return (
-    <div className="flex shrink-0 flex-col items-center" style={{ gap: "0.8vw", marginRight: "4vw" }}>
-      <div className="flex" style={{ gap: "0.6vw" }}>
-        {images.map((img, i) => (
-          // eslint-disable-next-line @next/next/no-img-element -- decorative belt photo, not the LCP image
-          <img
-            key={i}
-            src={img.src}
-            alt=""
-            className="shrink-0 rounded-[1vw] object-cover"
-            style={{ height: "15vw", aspectRatio: img.ratio }}
-          />
-        ))}
-      </div>
-      <p className="font-mono whitespace-nowrap uppercase text-white" style={{ fontSize: "1vw" }}>
-        {caption}
-      </p>
-    </div>
-  );
-}
-
-/**
- * The continuously-scrolling belt: the track renders the 5 clusters twice
- * back to back and animates exactly one copy's width (-50%, via the
- * `belt-scroll` keyframes in globals.css) so the loop is seamless — the
- * clusters read in order 1→5, then it wraps right back to 1 without a jump.
- */
-function PhotoBelt() {
-  return (
-    // Full-bleed to the actual viewport edges: this sits inside the page's
-    // EDGE_MARGIN-padded content column (like every other cluster here),
-    // so a plain 100% width would stop at that padding — the classic
-    // full-bleed trick (100vw width, pulled back by half the viewport
-    // minus half its own container) escapes it on both sides instead.
-    <div className="overflow-hidden" style={{ width: "100vw", marginLeft: "calc(50% - 50vw)" }}>
-      {/* Inline `animation` (not a Tailwind arbitrary class) + translate3d
-          in the keyframes + will-change: both halves of the track are
-          identical, so `-50%` always lands exactly on the seam between
-          them — this just makes sure the browser renders that seam on its
-          own GPU-composited layer instead of re-rasterizing the row on
-          every frame, which is what reads as a "jump"/reset at the loop
-          point on a long, wide row like this one. */}
-      <div className="flex" style={{ width: "max-content", animation: "belt-scroll 46s linear infinite", willChange: "transform" }}>
-        {[...CLUSTERS, ...CLUSTERS].map((cluster, i) => (
-          <Cluster key={i} {...cluster} />
-        ))}
-      </div>
-    </div>
-  );
-}
+// The ABOUT window's hover screen: Figma "About" (node 1069:1995), shared with /about via
+// AboutLayout. It has no background of its own, so the "hannah shin" letters behind it stay
+// visible, as in the Figma.
 
 /**
  * The visual design itself — sits behind the 3D flower (mount it before
- * <Spline> in the DOM, no z-index, so normal paint order puts Spline's
+ * the flower's canvas in the DOM, no z-index, so normal paint order puts the
  * canvas on top of it). Purely decorative: pointer-events are left off so
  * clicks always fall through to whatever's above it.
  */
 export function HoverAboutVisual() {
-  const { active, scrollOffset, setMaxScroll } = useHoverFigTree();
+  const { active } = useHoverFigTree();
   const isActive = active === "about";
-  const outerRef = useRef<HTMLDivElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-
-  // Same fit-to-space scaling as the other hover overlays — see
-  // HoverFigTree.tsx for the full reasoning.
-  const NON_FULLSCREEN_BOOST = 1.15;
-  const [scale, setScale] = useState(1);
-  // Centre the belt and word lines vertically when they fit; on screens too short for them,
-  // stay top-aligned so the overlay's scroll can still reach the top.
-  const [fits, setFits] = useState(true);
-  useEffect(() => {
-    const recompute = () => {
-      const outer = outerRef.current;
-      const content = contentRef.current;
-      if (!outer || !content) return;
-      const fitRatio = outer.clientHeight / content.scrollHeight;
-      const nextScale = Math.min(1, fitRatio * NON_FULLSCREEN_BOOST);
-      setScale(nextScale);
-      const renderedHeight = content.scrollHeight * nextScale;
-      setFits(renderedHeight <= outer.clientHeight);
-      setMaxScroll("about", Math.max(0, renderedHeight - outer.clientHeight));
-    };
-    recompute();
-    window.addEventListener("resize", recompute);
-    return () => window.removeEventListener("resize", recompute);
-  }, [setMaxScroll]);
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-black transition-opacity duration-300"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden transition-opacity duration-300"
       style={{ opacity: isActive ? 1 : 0 }}
       aria-hidden={!isActive}
       data-name="hover-about"
     >
-      <div
-        ref={outerRef}
-        className={`flex h-full w-full flex-col items-center ${fits ? "justify-center" : "justify-start"}`}
-        style={{ padding: "3vh 4vw" }}
-      >
-        <div
-          ref={contentRef}
-          className="flex w-full flex-col items-center"
-          style={{
-            gap: "3.5vw",
-            transform: `translateY(${-(scrollOffset["about"] ?? 0)}px) scale(${scale})`,
-            transformOrigin: "center",
-          }}
-        >
-          <PhotoBelt />
-          <RepeatingWordLines />
-        </div>
-      </div>
+      <AboutLayout />
     </div>
   );
 }
 
 /**
- * Invisible full-screen hit target that only turns on while the overlay is
- * active. Mounted above the Spline canvas but below the nav-marker boxes
+ * Invisible full-screen hit target that only turns on while the about or
+ * contact screen is up. Mounted above the Spline canvas but below the nav-marker boxes
  * (z-index between the two) so a click on an actual nav box still goes to
- * that box's own Link. /about isn't linkable from here anymore — a click
- * just closes the overlay, same as radio/playground.
+ * that box's own Link. A click here just closes the overlay, same as
+ * playground; the ABOUT window itself is what opens /about.
  */
 export function HoverAboutClickCatcher() {
-  const { active, deactivate, addScroll } = useHoverFigTree();
-  const isActive = active === "about";
+  const { active, deactivate } = useHoverFigTree();
+  const isActive = active !== null && CONNECT_SCREENS.includes(active);
 
   return (
     <div
@@ -172,9 +46,28 @@ export function HoverAboutClickCatcher() {
       style={{ zIndex: 5, pointerEvents: isActive ? "auto" : "none", cursor: isActive ? "pointer" : undefined }}
       aria-hidden={!isActive}
       onClick={() => deactivate()}
-      onWheel={(e) => {
-        if (isActive) addScroll("about", e.deltaY);
-      }}
     />
+  );
+}
+
+/** The screens LET'S CONNECT shows on: about's, and CONTACT's, which is LET'S CONNECT alone. */
+const CONNECT_SCREENS = ["about", "contact"];
+
+/**
+ * LET'S CONNECT's links, above the click-catcher (z-5) so they can be clicked, and below the
+ * glass windows (z-10). Only reachable while the about or contact screen shows.
+ */
+export function HoverAboutLinks() {
+  const { active } = useHoverFigTree();
+  const isActive = active !== null && CONNECT_SCREENS.includes(active);
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+      style={{ zIndex: 6, opacity: isActive ? 1 : 0 }}
+      inert={!isActive}
+    >
+      <AboutConnect />
+    </div>
   );
 }

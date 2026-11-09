@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import NameCanvasClient from "../../lab/name/NameCanvasClient";
+import type { HoverOverlayId } from "../spline/HoverFigTreeContext";
 
 // WebGL can't run during SSR, so the lily loads client-only (ssr: false has to live in a Client Component).
 const FlowerThree = dynamic(() => import("./FlowerThree"), { ssr: false });
@@ -16,8 +17,9 @@ const SLIDE = "transform 1100ms cubic-bezier(0.65, 0, 0.35, 1)";
  * The homepage hero: the three.js lily and its glass nav windows, over the "hannah shin" name strip.
  * While the lily loads, the name plays alone in the middle of the black screen; once it's ready
  * (and the intro has held for a moment) the name slides down into place and the flower fades in.
+ * /about and /contact are this same hero with the about or contact screen open (`restingOverlay`).
  */
-export default function HomeLilyClient() {
+export default function HomeLilyClient({ restingOverlay = null }: { restingOverlay?: HoverOverlayId | null }) {
   const [loaded, setLoaded] = useState(false);
   const [minHeld, setMinHeld] = useState(false);
   const onReady = useCallback(() => setLoaded(true), []);
@@ -32,6 +34,7 @@ export default function HomeLilyClient() {
     <FlowerThree
       onReady={onReady}
       revealed={!intro}
+      restingOverlay={restingOverlay}
       background={
         // Full width along the bottom of the screen, behind the flower (as it was behind the Spline one).
         // During the intro it's lifted to the vertical middle: half its own height, less half the screen.

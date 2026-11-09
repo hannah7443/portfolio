@@ -59,8 +59,8 @@ body {
   font-style: italic;
 }
 
-/* HoverAbout's continuously-scrolling photo belt: the track renders its
-   clusters twice back to back, and this animates exactly one copy's width
+/* AboutLayout's continuously-scrolling photo strip: the track renders its
+   photos twice back to back, and this animates exactly one copy's width
    (-50%) so the loop point is seamless. */
 @keyframes belt-scroll {
   from {
@@ -136,7 +136,7 @@ body {
   backdrop-filter: blur(14px);
 }
 
-/* Homepage and the fig tree and radio case studies: black behind everything, so
+/* Homepage, about, contact and the fig tree and radio case studies: black behind everything, so
    scrolling past the hero or overscrolling (rubber-banding) shows black instead of the cream page
    background used elsewhere. */
 html:has([data-page="home"]),
@@ -144,6 +144,10 @@ html:has([data-page="home"]) body,
 html:has([data-page="fig-tree"]),
 html:has([data-page="fig-tree"]) body,
 html:has([data-page="radio"]),
-html:has([data-page="radio"]) body {
+html:has([data-page="radio"]) body,
+html:has([data-page="about"]),
+html:has([data-page="about"]) body,
+html:has([data-page="contact"]),
+html:has([data-page="contact"]) body {
   background: #000;
 }
